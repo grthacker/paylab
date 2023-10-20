@@ -185,11 +185,6 @@ class InstantPayController extends Controller
         echo $response->getBody();
     }
 
-
-
-
-
-
     public function miniStatement(Request $request)
     {
         $requestData = $request->all();
