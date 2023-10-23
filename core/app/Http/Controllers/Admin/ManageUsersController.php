@@ -205,7 +205,7 @@ class ManageUsersController extends Controller
             $user->balance -= $amount;
             $user->save();
 
-         
+
 
             $transaction = new Transaction();
             $transaction->user_id = $user->id;
@@ -298,7 +298,7 @@ class ManageUsersController extends Controller
 
 
     public function depViaMethod($method, $userId , $type = null){
-        $method = Gateway::where('alias',$method)->firstOrFail();        
+        $method = Gateway::where('alias',$method)->firstOrFail();
         $user = User::findOrFail($userId);
         if ($type == 'approved') {
             $page_title = 'Approved Payment Via '.$method->name;

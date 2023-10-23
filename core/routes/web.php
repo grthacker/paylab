@@ -12,9 +12,10 @@ Route::get('/clear', function () {
 |--------------------------------------------------------------------------
 */
 Route::get('test', 'InstantPayController@test')->name('test');
-Route::get('bank', 'InstantPayController@bank')->name('bank');
-Route::get('payoutBanks', 'InstantPayController@payoutBanks')->name('payoutBanks');
-Route::get('getMerchantList', 'InstantPayController@getMerchantList')->name('getMerchantList');
+Route::get('getBillerList', 'InstantPayController@getBillerList')->name('getBillerList');
+Route::get('telecomCircle', 'InstantPayController@telecomCircle')->name('telecomCircle');
+Route::get('getRechargePlan', 'InstantPayController@getRechargePlan')->name('getRechargePlan');
+
 
 Route::namespace('Gateway')->prefix('ipn')->name('ipn.')->group(function () {
     Route::post('paypal', 'paypal\ProcessController@ipn')->name('paypal');

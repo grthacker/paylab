@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Image;
 use Validator;
+use App\Http\Controllers\InstantPayController;
 
 class UserController extends Controller
 {
@@ -33,7 +34,7 @@ class UserController extends Controller
         $widgets['total_deposit'] = Deposit::where('user_id', $user->id)->where('status', 1)->sum('amount');
         $widgets['total_trx'] = Transaction::where('user_id', $user->id)->count();
         $widgets['count_apply_service'] = ApplyService::where('user_id', $user->id)->where('status', '!=', 0)->count();
-        $widgets['count_apply_service_pending'] = ApplyService::where('user_id', $user->id)->where('status',2)->count();
+        $widgets['count_apply_service_pending'] = ApplyService::where('user_id', $user->id)->where('status', 2)->count();
         $widgets['downline'] = User::where('ref_by', $user->id)->count();
 
         return view($this->activeTemplate . 'user.dashboard', compact('page_title', 'user', 'latestTrx', 'widgets'));
@@ -43,7 +44,7 @@ class UserController extends Controller
     {
         $data['page_title'] = "Profile Setting";
         $data['user'] = Auth::user();
-        return view($this->activeTemplate. 'user.profile-setting', $data);
+        return view($this->activeTemplate . 'user.profile-setting', $data);
     }
 
     public function submitProfile(Request $request)
@@ -56,9 +57,9 @@ class UserController extends Controller
             'zip' => 'sometimes|required|max:40',
             'city' => 'sometimes|required|max:50',
             'image' => 'mimes:png,jpg,jpeg'
-        ],[
-            'firstname.required'=>'First Name Field is required',
-            'lastname.required'=>'Last Name Field is required'
+        ], [
+            'firstname.required' => 'First Name Field is required',
+            'lastname.required' => 'Last Name Field is required'
         ]);
 
 
@@ -81,7 +82,7 @@ class UserController extends Controller
             $location = 'assets/images/user/profile/' . $filename;
             $in['image'] = $filename;
             // Check if the directory exists and has write permissions
-            
+
             $path = './assets/images/user/profile/';
             $link = $path . $user->image;
             if (file_exists($link)) {
@@ -139,23 +140,24 @@ class UserController extends Controller
     }
 
 
-    protected function strongPassCheck($password){
+    protected function strongPassCheck($password)
+    {
         $password = $password;
         $capital = '/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]/';
-        $capital = preg_match($capital,$password);
+        $capital = preg_match($capital, $password);
         $notify = null;
         if (!$capital) {
-            $notify[] = ['error','Minimum 1 capital word is required'];
+            $notify[] = ['error', 'Minimum 1 capital word is required'];
         }
         $number = '/[1234567890]/';
-        $number = preg_match($number,$password);
+        $number = preg_match($number, $password);
         if (!$number) {
-            $notify[] = ['error','Minimum 1 number is required'];
+            $notify[] = ['error', 'Minimum 1 number is required'];
         }
         $special = '/[`!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?~\']/';
-        $special = preg_match($special,$password);
+        $special = preg_match($special, $password);
         if (!$special) {
-            $notify[] = ['error','Minimum 1 special character is required'];
+            $notify[] = ['error', 'Minimum 1 special character is required'];
         }
         return $notify;
     }
@@ -183,7 +185,7 @@ class UserController extends Controller
         $prevcode = $user->tsc;
         $prevqr = $ga->getQRCodeGoogleUrl($user->username . '@' . $gnl->sitename, $prevcode);
         $page_title = 'Two Factor';
-        return view($this->activeTemplate.'user.twofactor', compact('page_title', 'secret', 'qrCodeUrl', 'prevcode', 'prevqr'));
+        return view($this->activeTemplate . 'user.twofactor', compact('page_title', 'secret', 'qrCodeUrl', 'prevcode', 'prevqr'));
     }
 
     public function create2fa(Request $request)
@@ -264,27 +266,25 @@ class UserController extends Controller
     }
 
 
-    public function services(){
+    public function services()
+    {
         $page_title = 'Services';
-        $services = Service::where('status', 1)->whereHas('category', function($query){
+        $services = Service::where('status', 1)->whereHas('category', function ($query) {
             $query->where('status', 1);
         })->paginate(getPaginate());
 
-        return view($this->activeTemplate.'user.service.services', compact('page_title', 'services'));
+
+        return view($this->activeTemplate . 'user.service.services', compact('page_title', 'services'));
     }
 
-    public function serviceApply(Request $request){
-
-        $request->validate([
-            'id'=>'required|exists:services',
-            'amount'=>'required|numeric|gt:0'
-        ]);
+    public function serviceApply($request)
+    {
 
         $findService = Service::where('id', $request->id)
-                              ->where('status', 1)
-                              ->whereHas('category', function($query){
-                                   $query->where('status', 1);
-                               })->firstOrFail();
+            ->where('status', 1)
+            ->whereHas('category', function ($query) {
+                $query->where('status', 1);
+            })->firstOrFail();
 
         $chargeFree = 0;
         $requiredBalnce = 0;
@@ -292,14 +292,14 @@ class UserController extends Controller
         $charge = 0;
         $amount = $request->amount;
 
-        if($chargeFree == $findService->fixed_charge + $findService->parcent_charge){
+        if ($chargeFree == $findService->fixed_charge + $findService->parcent_charge) {
             $requiredBalnce = $amount;
-        }else{
+        } else {
             $charge = $findService->fixed_charge + ($amount * $findService->percent_charge / 100);
             $requiredBalnce = $amount + $charge;
         }
 
-        if($user->balance < $requiredBalnce){
+        if ($user->balance < $requiredBalnce) {
             $notify[] = ['error', 'Sorry insufficient balance'];
             return redirect()->route('user.deposit')->withNotify($notify);
         }
@@ -312,48 +312,57 @@ class UserController extends Controller
         $apply->after_charge = $requiredBalnce;
         $apply->save();
 
-        return redirect()->route('user.service.confirm', $apply->id);
+        return $apply->id;
     }
 
-    public function serviceConfirm($id){
+    public function serviceConfirm($id)
+    {
 
-        $apply = ApplyService::where('status', 0)
-                             ->where('id', $id)
-                             ->where('user_id', Auth::user()->id)
-                             ->firstOrFail();
+        // $apply = ApplyService::where('status', 0)
+        //     ->where('id', $id)
+        //     ->where('user_id', Auth::user()->id)
+        //     ->firstOrFail();
 
-        $service = Service::where('id', $apply->service_id)
-                          ->where('status', 1)
-                          ->whereHas('category', function($query){
-                              $query->where('status', 1);
-                          })->firstOrFail();
+        $service = Service::where('id', $id)
+            ->where('status', 1)
+            ->whereHas('category', function ($query) {
+                $query->where('status', 1);
+            })->firstOrFail();
 
         $page_title = 'Service Confirmation';
         $user = Auth::user();
 
-        return view($this->activeTemplate.'user.service.confirmService', compact('page_title', 'apply', 'service', 'user'));
+        $operator  = new InstantPayController();
+        $operator = $operator->getBillerList();
+
+        return view($this->activeTemplate . 'user.service.confirmService', compact('page_title', 'service', 'user', 'operator'));
     }
 
-    public function serviceSubmit(Request $request){
+    public function serviceSubmit(Request $request)
+    {
+
+        //$requestData = $request->all();
+
+        $serid = $this->serviceApply($request);
 
         $user = Auth::user();
         $apply = ApplyService::where('status', 0)
-                             ->where('user_id', $user->id)
-                             ->where('id', $request->id)
-                             ->firstOrFail();
+            ->where('user_id', $user->id)
+            ->where('id', $serid)
+            ->firstOrFail();
 
         $findService = Service::where('id', $apply->service_id)
-                              ->where('status', 1)
-                              ->whereHas('category', function($query){
-                                  $query->where('status', 1);
-                              })->firstOrFail();
+            ->where('status', 1)
+            ->whereHas('category', function ($query) {
+                $query->where('status', 1);
+            })->firstOrFail();
 
 
         $customValidation = [];
         $customValidation['id'] = 'required|exists:apply_services,id';
         $selectField = [];
 
-        if($findService->select_field && $findService->category->field_name){
+        if ($findService->select_field && $findService->category->field_name) {
             $selectArray = json_decode($findService->select_field, true);
             $selectFieldName = array_keys($selectArray);
             $selectFieldName = implode(' ', $selectFieldName);
@@ -362,12 +371,12 @@ class UserController extends Controller
 
             $selectField[$selectFieldName] = $request->$selectFieldName;
 
-            $customValidation[$selectFieldName] = 'required|in:'.$selectValues;
+            $customValidation[$selectFieldName] = 'required|in:' . $selectValues;
         }
 
-        foreach(json_decode($findService->user_data, true) as $key => $value) {
+        foreach (json_decode($findService->user_data, true) as $key => $value) {
             $iamge = $value['type'] == 'file' ? '|image|mimes:jpeg,png,jpg|max:2048' : null;
-            $customValidation[$key] = $value['validation'] .$iamge;
+            $customValidation[$key] = $value['validation'] . $iamge;
         }
 
         $request->validate(
@@ -375,29 +384,29 @@ class UserController extends Controller
         );
 
 
-        if($user->balance < $apply->after_charge){
+        if ($user->balance < $apply->after_charge) {
             $notify[] = ['error', 'Sorry insufficient balance'];
             return redirect()->route('user.deposit')->withNotify($notify);
         }
 
         $directory = '';
-        $path = imagePath()['service']['path'].'/'.$directory;
+        $path = imagePath()['service']['path'] . '/' . $directory;
         $collection = collect($request);
         $reqField = [];
 
-        foreach($collection as $k => $v) {
+        foreach ($collection as $k => $v) {
             foreach (json_decode($findService->user_data) as $inKey => $inVal) {
                 if ($k != $inKey) {
                     continue;
                 } else {
                     if ($inVal->type == 'file') {
-                        if($request->hasFile($inKey)) {
+                        if ($request->hasFile($inKey)) {
                             try {
-                               $reqField[$inKey] = [
-                                        'field_name' => $inKey,
-                                        'field_value' => $directory.'/'.uploadImage($request[$inKey], $path),
-                                        'type' => $inVal->type,
-                                    ];
+                                $reqField[$inKey] = [
+                                    'field_name' => $inKey,
+                                    'field_value' => $directory . '/' . uploadImage($request[$inKey], $path),
+                                    'type' => $inVal->type,
+                                ];
                             } catch (\Exception $exp) {
                                 $notify[] = ['error', 'Could not upload your ' . $request[$inKey]];
                                 return back()->withNotify($notify)->withInput();
@@ -405,11 +414,11 @@ class UserController extends Controller
                         }
                     } else {
                         $reqField[$inKey] = $v;
-                            $reqField[$inKey] = [
-                                'field_name' => $inKey,
-                                'field_value' => $v,
-                                'type' => $inVal->type,
-                            ];
+                        $reqField[$inKey] = [
+                            'field_name' => $inKey,
+                            'field_value' => $v,
+                            'type' => $inVal->type,
+                        ];
                     }
                 }
             }
@@ -434,13 +443,13 @@ class UserController extends Controller
         $transaction->post_balance = getAmount($user->balance);
         $transaction->charge = getAmount($apply->total_charge);
         $transaction->trx_type = '-';
-        $transaction->details = 'Requested for ' . $apply->service->category->name.' service';
+        $transaction->details = 'Requested for ' . $apply->service->category->name . ' service';
         $transaction->trx =  getTrx();
         $transaction->save();
 
         $adminNotification = new AdminNotification();
         $adminNotification->user_id = $user->id;
-        $adminNotification->title = $transaction->details.' from '.$user->username;
+        $adminNotification->title = $transaction->details . ' from ' . $user->username;
         $adminNotification->click_url = route('admin.applied.pending.service');
         $adminNotification->save();
 
@@ -457,35 +466,32 @@ class UserController extends Controller
         return redirect()->route('user.history.service')->withNotify($notify);
     }
 
-    public function serviceHistory(){
+    public function serviceHistory()
+    {
         $page_title = 'Service History';
         $histories = ApplyService::where('user_id', Auth::user()->id)->where('status', '!=', 0)->latest()->paginate(getPaginate());
-        return view($this->activeTemplate.'user.service.history', compact('page_title', 'histories'));
+        return view($this->activeTemplate . 'user.service.history', compact('page_title', 'histories'));
     }
 
-    public function serviceHistoryPending(){
+    public function serviceHistoryPending()
+    {
         $page_title = 'Pending Service History';
-        $histories = ApplyService::where('user_id', Auth::user()->id)->where('status',2)->latest()->paginate(getPaginate());
-        return view($this->activeTemplate.'user.service.history', compact('page_title', 'histories'));
+        $histories = ApplyService::where('user_id', Auth::user()->id)->where('status', 2)->latest()->paginate(getPaginate());
+        return view($this->activeTemplate . 'user.service.history', compact('page_title', 'histories'));
     }
 
-    public function trxHistory(){
+    public function trxHistory()
+    {
         $page_title = 'Transaction Histories';
         $histories = Transaction::where('user_id', Auth::user()->id)->latest()->paginate(getPaginate());
-        return view($this->activeTemplate.'user.trxHistory', compact('page_title', 'histories'));
+        return view($this->activeTemplate . 'user.trxHistory', compact('page_title', 'histories'));
     }
 
-    public function downlines(){
+    public function downlines()
+    {
         $page_title = 'Downline';
         $user = Auth::user();
         $downlines = User::where('ref_by', $user->id)->latest()->paginate(getPaginate());
-        return view($this->activeTemplate.'user.downlines', compact('page_title', 'downlines'));
+        return view($this->activeTemplate . 'user.downlines', compact('page_title', 'downlines'));
     }
-
-
-
-
-
 }
-
-

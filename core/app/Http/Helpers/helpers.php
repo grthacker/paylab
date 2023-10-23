@@ -12,7 +12,8 @@ use PHPMailer\PHPMailer\SMTP;
 use Carbon\Carbon;
 
 
-function sidebarVariation(){
+function sidebarVariation()
+{
 
     /// for sidebar
     $variation['sidebar'] = 'bg_img';
@@ -21,13 +22,12 @@ function sidebarVariation(){
     $variation['selector'] = 'capsule--rounded';
 
     //for overlay
-    $variation['overlay'] = 'overlay--indigo'; 
-    
+    $variation['overlay'] = 'overlay--indigo';
+
     //Opacity
     $variation['opacity'] = 'overlay--opacity-8'; // 1-10
 
     return $variation;
-
 }
 
 function systemDetails()
@@ -107,7 +107,7 @@ function uploadImage($file, $location, $size = null, $old = null, $thumb = null)
     $image = Image::make($file);
     if (!empty($size)) {
         $size = explode('x', strtolower($size));
-        $image->resize($size[0], $size[1],function($constraint){
+        $image->resize($size[0], $size[1], function ($constraint) {
             $constraint->aspectRatio();
             $constraint->upsize();
         });
@@ -117,7 +117,7 @@ function uploadImage($file, $location, $size = null, $old = null, $thumb = null)
     if (!empty($thumb)) {
 
         $thumb = explode('x', $thumb);
-        Image::make($file)->resize($thumb[0], $thumb[1],function($constraint){
+        Image::make($file)->resize($thumb[0], $thumb[1], function ($constraint) {
             $constraint->aspectRatio();
             $constraint->upsize();
         })->save($location . '/thumb_' . $filename);
@@ -126,7 +126,8 @@ function uploadImage($file, $location, $size = null, $old = null, $thumb = null)
     return $filename;
 }
 
-function uploadFile($file, $location, $size = null, $old = null){
+function uploadFile($file, $location, $size = null, $old = null)
+{
     $path = makeDirectory($location);
     if (!$path) throw new Exception('File could not been created.');
 
@@ -135,7 +136,7 @@ function uploadFile($file, $location, $size = null, $old = null){
     }
 
     $filename = uniqid() . time() . '.' . $file->getClientOriginalExtension();
-    $file->move($location,$filename);
+    $file->move($location, $filename);
     return $filename;
 }
 
@@ -198,13 +199,13 @@ function loadTawkto()
 
 function loadFbComment()
 {
-    $comment = Extension::where('act', 'fb-comment')->where('status',1)->first();
+    $comment = Extension::where('act', 'fb-comment')->where('status', 1)->first();
     return  $comment ? $comment->generateScript() : '';
 }
 
 function getCustomCaptcha($height = 46, $width = '300px', $bgcolor = '#003', $textcolor = '#abc')
 {
-    $textcolor = '#'.GeneralSetting::first()->base_color;
+    $textcolor = '#' . GeneralSetting::first()->base_color;
     $captcha = Extension::where('act', 'custom-captcha')->where('status', 1)->first();
     if (!$captcha) {
         return 0;
@@ -247,7 +248,7 @@ function getTrx($length = 12)
 
 function getAmount($amount, $length = 0)
 {
-    if(0 < $length){
+    if (0 < $length) {
         return round($amount + 0, $length);
     }
     return $amount + 0;
@@ -359,7 +360,8 @@ function getIpInfo()
 }
 
 //moveable
-function osBrowser(){
+function osBrowser()
+{
     $user_agent = $_SERVER['HTTP_USER_AGENT'];
     $os_platform = "Unknown OS Platform";
     $os_array = array(
@@ -460,14 +462,14 @@ function getPageSections($arr = false)
 }
 
 
-function getImage($image,$size = null)
+function getImage($image, $size = null)
 {
     $clean = '';
     $size = $size ? $size : 'undefined';
     if (file_exists($image) && is_file($image)) {
         return asset($image) . $clean;
-    }else{
-        return route('placeholderImage',$size);
+    } else {
+        return route('placeholderImage', $size);
     }
 }
 
@@ -523,13 +525,13 @@ function sendEmail($user, $type = null, $shortCodes = [])
     $config = $general->mail_config;
 
     if ($config->name == 'php') {
-        sendPhpMail($user->email, $user->username,$email_template->subj, $message);
+        sendPhpMail($user->email, $user->username, $email_template->subj, $message);
     } else if ($config->name == 'smtp') {
-        sendSmtpMail($config, $user->email, $user->username, $email_template->subj, $message,$general);
+        sendSmtpMail($config, $user->email, $user->username, $email_template->subj, $message, $general);
     } else if ($config->name == 'sendgrid') {
-        sendSendGridMail($config, $user->email, $user->username, $email_template->subj, $message,$general);
+        sendSendGridMail($config, $user->email, $user->username, $email_template->subj, $message, $general);
     } else if ($config->name == 'mailjet') {
-        sendMailjetMail($config, $user->email, $user->username, $email_template->subj, $message,$general);
+        sendMailjetMail($config, $user->email, $user->username, $email_template->subj, $message, $general);
     }
 }
 
@@ -545,7 +547,7 @@ function sendPhpMail($receiver_email, $receiver_name, $subject, $message)
 }
 
 
-function sendSmtpMail($config, $receiver_email, $receiver_name, $subject, $message,$gnl)
+function sendSmtpMail($config, $receiver_email, $receiver_name, $subject, $message, $gnl)
 {
     $mail = new PHPMailer(true);
 
@@ -558,7 +560,7 @@ function sendSmtpMail($config, $receiver_email, $receiver_name, $subject, $messa
         $mail->Password   = $config->password;
         if ($config->enc == 'ssl') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        }else{
+        } else {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         }
         $mail->Port       = $config->port;
@@ -578,7 +580,7 @@ function sendSmtpMail($config, $receiver_email, $receiver_name, $subject, $messa
 }
 
 
-function sendSendGridMail($config, $receiver_email, $receiver_name, $subject, $message,$gnl)
+function sendSendGridMail($config, $receiver_email, $receiver_name, $subject, $message, $gnl)
 {
     $sendgridMail = new \SendGrid\Mail\Mail();
     $sendgridMail->setFrom($gnl->email_from, $gnl->sitetitle);
@@ -594,7 +596,7 @@ function sendSendGridMail($config, $receiver_email, $receiver_name, $subject, $m
 }
 
 
-function sendMailjetMail($config, $receiver_email, $receiver_name, $subject, $message,$gnl)
+function sendMailjetMail($config, $receiver_email, $receiver_name, $subject, $message, $gnl)
 {
     $mj = new \Mailjet\Client($config->public_key, $config->secret_key, true, ['version' => 'v3.1']);
     $body = [
@@ -657,11 +659,11 @@ function imagePath()
         'size' => '500x500',
     ];
     $data['verify'] = [
-        'withdraw'=>[
-            'path'=>'assets/images/verify/withdraw'
+        'withdraw' => [
+            'path' => 'assets/images/verify/withdraw'
         ],
-        'deposit'=>[
-            'path'=>'assets/images/verify/deposit'
+        'deposit' => [
+            'path' => 'assets/images/verify/deposit'
         ]
     ];
     $data['image'] = [
@@ -694,13 +696,13 @@ function imagePath()
         'size' => '600x315'
     ];
     $data['profile'] = [
-        'user'=> [
-            'path'=>'assets/images/user/profile',
-            'size'=>'350x300'
+        'user' => [
+            'path' => 'assets/images/user/profile',
+            'size' => '350x300'
         ],
-        'admin'=> [
-            'path'=>'assets/admin/images/profile',
-            'size'=>'400x400'
+        'admin' => [
+            'path' => 'assets/admin/images/profile',
+            'size' => '400x400'
         ]
     ];
     return $data;
@@ -750,7 +752,7 @@ function sendGeneralEmail($email, $subject, $message, $receiver_name = '')
     }
 }
 
-function getContent($data_keys, $singleQuery = false, $limit = null,$orderById = false)
+function getContent($data_keys, $singleQuery = false, $limit = null, $orderById = false)
 {
     if ($singleQuery) {
         $content = Frontend::where('data_keys', $data_keys)->latest()->first();
@@ -759,9 +761,9 @@ function getContent($data_keys, $singleQuery = false, $limit = null,$orderById =
         $article->when($limit != null, function ($q) use ($limit) {
             return $q->limit($limit);
         });
-        if($orderById){
+        if ($orderById) {
             $content = $article->where('data_keys', $data_keys)->orderBy('id')->get();
-        }else{
+        } else {
             $content = $article->where('data_keys', $data_keys)->latest()->get();
         }
     }
@@ -769,14 +771,21 @@ function getContent($data_keys, $singleQuery = false, $limit = null,$orderById =
 }
 
 
-function gatewayRedirectUrl($type = false){
+function gatewayRedirectUrl($type = false)
+{
     if ($type) {
         return 'user.deposit.history';
-    }else{
+    } else {
         return 'user.deposit';
     }
 }
 
-function paginateLinks($data, $design = 'admin.partials.paginate'){
+function paginateLinks($data, $design = 'admin.partials.paginate')
+{
     return $data->appends(request()->all())->links($design);
+}
+
+function generateRandomString($length = 10)
+{
+    return bin2hex(random_bytes($length));
 }

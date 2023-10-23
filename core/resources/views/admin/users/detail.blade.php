@@ -51,7 +51,7 @@
                             <span class="font-weight-bold">
                                 @if($upline)
                                     {{ __($upline->fullname) }}
-                                @else 
+                                @else
                                     @lang('N/A')
                                 @endif
                             </span>
@@ -339,7 +339,7 @@
         (function ($) {
 
         "use strict";
-        
+
             $("select[name=country]").val("{{ @$user->address->country }}");
 
 
