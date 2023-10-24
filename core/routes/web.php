@@ -11,7 +11,8 @@ Route::get('/clear', function () {
 | Web Routes
 |--------------------------------------------------------------------------
 */
-Route::get('test', 'InstantPayController@test')->name('test');
+Route::get('banks', 'InstantPayController@banks')->name('banks');
+Route::get('getIp', 'InstantPayController@getIp')->name('getIp');
 Route::get('getBillerList', 'InstantPayController@getBillerList')->name('getBillerList');
 Route::get('telecomCircle', 'InstantPayController@telecomCircle')->name('telecomCircle');
 Route::get('getRechargePlan', 'InstantPayController@getRechargePlan')->name('getRechargePlan');

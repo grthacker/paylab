@@ -61,6 +61,10 @@ class InstantPayController extends Controller
         return $responseData['data']['records'];
     }
 
+    public function getIp()
+    {
+        echo $this->public_ip;
+    }
 
     public function telecomCircle()
     {
@@ -233,5 +237,71 @@ class InstantPayController extends Controller
         $responseBody = json_decode($responseBody, true);
 
         return $responseBody;
+    }
+
+    public function banks()
+    {
+        $client = new Client();
+
+        $headers = [
+            'X-Ipay-Auth-Code' => '1',
+            'X-Ipay-Client-Id' => $this->clientID,
+            'X-Ipay-Client-Secret' => $this->client_secret,
+            'X-Ipay-Endpoint-Ip' => $this->public_ip,
+            'X-Ipay-Outlet-Id' => '296327'
+        ];
+
+        $response = $client->request('GET', 'https://api.instantpay.in/payments/payout/banks', [
+            'headers' => $headers,
+        ]);
+
+        $responseBody = $response->getBody()->getContents();
+        $responseData = json_decode($responseBody, true);
+
+        return $responseData['data'];
+    }
+
+    public function bankTransfer($data = '')
+    {
+        $client = new Client();
+        $account =  $data['receiver_account_number']['field_value'];
+        $name =  $data['receiver_name']['field_value'];
+        $ifsc =  $data['ifsc']['field_value'];
+        $amount =  $data['amount']['field_value'];
+
+        $headers = [
+            'X-Ipay-Auth-Code' => '1',
+            'X-Ipay-Client-Id' => $this->clientID,
+            'X-Ipay-Client-Secret' => $this->client_secret,
+            'X-Ipay-Endpoint-Ip' => $this->public_ip,
+            'Content-Type' => 'application/json',
+        ];
+
+        $data = [
+            "payer" => [
+                "bankProfileId" => "1***1",
+                "accountNumber" => "0*********5"
+            ],
+            "payee" => [
+                "name" => $name,
+                "accountNumber" => $account,
+                "bankIfsc" => $ifsc,
+                "payeeListId" => "342134987"
+            ],
+            "transferMode" => "IMPS",
+            "transferAmount" => $amount,
+            "externalRef" => "IMPS1",
+            "latitude" => "20.**36",
+            "longitude" => "78.**28",
+        ];
+
+        $response = $client->request('POST', 'https://api.instantpay.in/payments/payout', [
+            'headers' => $headers,
+            'json' => $data,
+        ]);
+
+        $responseBody = $response->getBody()->getContents();
+        $responseData = json_decode($responseBody, true);
+        return $responseData;
     }
 }

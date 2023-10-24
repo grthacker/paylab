@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Image;
-use Validator;
+
 use App\Http\Controllers\InstantPayController;
 
 class UserController extends Controller
@@ -345,6 +345,8 @@ class UserController extends Controller
         } else if ($id == 6) {
             //Electricity
             $operator = $operator->getBillerList('C04');
+        } else if ($id == 9) {
+            $operator = $operator->banks();
         } else {
             $operator = array();
         }

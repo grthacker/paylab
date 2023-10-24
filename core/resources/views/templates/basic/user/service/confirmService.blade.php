@@ -124,6 +124,52 @@
                                             </div>
                                         @endif
 
+                                        @if ($service->id == 9)
+                                            @if ($service->select_field && $service->category->field_name)
+                                                @php
+                                                    $array = json_decode($service->select_field, true);
+                                                    $fieldName = array_keys($array);
+                                                    $fieldName = implode(' ', $fieldName);
+                                                    $options = $array[$fieldName];
+                                                @endphp
+                                                <div class="investment-information-group">
+                                                    <label class="invest-label">
+                                                        {{ ucfirst(__($fieldName)) }}
+                                                        <span class="">*</span>
+                                                    </label>
+                                                    <div class="investment-inner-group form-group">
+                                                        <select name="{{ $fieldName }}" required=""
+                                                            class="form-control">
+                                                            <option value="">---@lang('Select ')
+                                                                {{ __($fieldName) }}---</option>
+                                                            @foreach ($options as $data)
+                                                                <option value="{{ $data }}">
+                                                                    {{ ucfirst(__($data)) }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            {{-- <div class="investment-information-group">
+                                                <label class="invest-label">
+                                                    {{ ucfirst(__('Banks')) }}
+                                                    <span class="">*</span>
+                                                </label>
+                                                <div class="investment-inner-group form-group">
+                                                    <select name="{{ 'Banks' }}" required="" class="form-control"
+                                                        id="operator-select">
+                                                        <option value="">---@lang('Select ') {{ __('Banks') }}---
+                                                        </option>
+                                                        @foreach ($operator as $data)
+                                                            <option value="{{ $data['bankId'] }}">
+                                                                {{ ucfirst(__($data['name'])) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div> --}}
+                                        @endif
+
                                         @if ($service->id == 6)
                                             <div class="investment-information-group">
                                                 <label class="invest-label">
