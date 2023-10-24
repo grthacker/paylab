@@ -196,12 +196,10 @@
                                     </div>
 
                                     <div class="dynamic-form w-100">
-
                                         <div class="col-lg-12 selectElement">
                                             <div class="card border--dark my-2">
                                                 <h5 class="card-header bg--dark selectName"> {{ __($label) }} </h5>
                                                 <div class="card-body">
-
                                                     <div class="form-group">
                                                         <div class="input-group mb-md-0 mb-4">
                                                             <select name="select[]" id="multipleSelect"
@@ -210,7 +208,6 @@
                                                             </select>
                                                         </div>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
