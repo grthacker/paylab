@@ -333,7 +333,21 @@ class UserController extends Controller
         $user = Auth::user();
 
         $operator  = new InstantPayController();
-        $operator = $operator->getBillerList();
+        if ($id == 1) {
+            //Mobile Prepaid
+            $operator = $operator->getBillerList('C00');
+        } else if ($id == 5) {
+            //Gas
+            $operator = $operator->getBillerList('C14');
+        } else if ($id == 3) {
+            //Broadband
+            $operator = $operator->getBillerList('C05');
+        } else if ($id == 6) {
+            //Electricity
+            $operator = $operator->getBillerList('C04');
+        } else {
+            $operator = array();
+        }
 
         return view($this->activeTemplate . 'user.service.confirmService', compact('page_title', 'service', 'user', 'operator'));
     }

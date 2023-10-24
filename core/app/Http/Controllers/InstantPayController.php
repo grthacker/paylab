@@ -12,8 +12,6 @@ class InstantPayController extends Controller
 {
     private $clientID;
     private $client_secret;
-    private $EnKey;
-
     public $activeTemplate;
     private $public_ip;
     public function __construct()
@@ -25,8 +23,9 @@ class InstantPayController extends Controller
         $this->public_ip = file_get_contents('https://api.ipify.org');
     }
 
-    public function getBillerList()
+    public function getBillerList($cate = 'C05')
     {
+
         $client = new Client();
 
         $headers = [
@@ -45,7 +44,7 @@ class InstantPayController extends Controller
                 'recordsPerPage' => 20
             ],
             'filters' => [
-                'categoryKey' => 'C00',
+                'categoryKey' => $cate,
                 'updatedAfterDate' => ''
             ]
         ];
@@ -57,6 +56,7 @@ class InstantPayController extends Controller
 
         $responseBody = $response->getBody()->getContents();
         $responseData = json_decode($responseBody, true);
+
 
         return $responseData['data']['records'];
     }
@@ -77,26 +77,19 @@ class InstantPayController extends Controller
         ];
 
         $data = [
-            'type' => 'OPERATOR',
-            'msisdn' => '',
-            'billerId' => 'RJP'
+            "type" => "MSISDN",
+            "msisdn" => "941234",
+            "billerId" => ""
         ];
 
-        try {
-            $response = $client->request('POST', 'https://api.instantpay.in/marketplace/utilityPayments/circle', [
-                'headers' => $headers,
-                'json' => $data,
-            ]);
+        $response = $client->request('POST', 'https://api.instantpay.in/marketplace/utilityPayments/circle', [
+            'headers' => $headers,
+            'json' => $data,
+        ]);
 
-            echo $response->getBody();
-        } catch (RequestException $e) {
-            if ($e->hasResponse()) {
-                echo "Status code: " . $e->getResponse()->getStatusCode() . "\n";
-                echo "Response body: " . $e->getResponse()->getBody()->getContents() . "\n";
-            } else {
-                echo "Request failed: " . $e->getMessage() . "\n";
-            }
-        }
+        $responseBody = $response->getBody()->getContents();
+        $responseData = json_decode($responseBody, true);
+        dd($responseData);
     }
 
     public function getRechargePlan(Request $request)
@@ -133,6 +126,35 @@ class InstantPayController extends Controller
         return $responseData['data']['plans'];
     }
 
+    public function getBillerDetails($cate = 'PSPCL0000PUN01')
+    {
+
+        $client = new Client();
+
+        $headers = [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'X-Ipay-Auth-Code' => '1',
+            'X-Ipay-Client-Id' => $this->clientID,
+            'X-Ipay-Client-Secret' => $this->client_secret,
+            'X-Ipay-Endpoint-Ip' => $this->public_ip,
+            'X-Ipay-Outlet-Id' => '296327'
+        ];
+
+        $data = [
+            "billerId" => $cate
+        ];
+
+        $response = $client->request('POST', 'https://api.instantpay.in/marketplace/utilityPayments/billerDetails', [
+            'headers' => $headers,
+            'json' => $data,
+        ]);
+
+        $responseBody = $response->getBody()->getContents();
+        $responseBody = json_decode($responseBody, true);
+        dd($responseBody);
+        return $responseBody;
+    }
 
 
     public function getMerchantList()
@@ -143,7 +165,7 @@ class InstantPayController extends Controller
             'X-Ipay-Auth-Code' => '1',
             'X-Ipay-Client-Id' => $this->clientID,
             'X-Ipay-Client-Secret' => $this->client_secret,
-            'X-Ipay-Endpoint-Ip' => '180.188.237.1',
+            'X-Ipay-Endpoint-Ip' => $this->public_ip,
             'Content-Type' => 'application/json'
         ];
         $data = [
@@ -169,5 +191,47 @@ class InstantPayController extends Controller
         $log->save();
 
         echo $response->getBody();
+    }
+
+    public function getBillEnquiry(Request $request)
+    {
+        $client = new Client();
+
+        $headers = [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+            'X-Ipay-Auth-Code' => '1',
+            'X-Ipay-Client-Id' => $this->clientID,
+            'X-Ipay-Client-Secret' => $this->client_secret,
+            'X-Ipay-Endpoint-Ip' => $this->public_ip,
+            'X-Ipay-Outlet-Id' => '296327'
+        ];
+
+        $data = [
+            "billerId" => $request->operator ?? 'ATBROAD00NAT01',
+            "initChannel" => "AGT",
+            "externalRef" => "123TEST",
+            "inputParameters" => [
+                "param1" => '9478956789',
+            ],
+            "deviceInfo" => [
+                "mac" => "BC-BE-33-65-E6-AC",
+                "ip" => "103.254.205.164"
+            ],
+            "remarks" => [
+                "param1" => 9999999999
+            ],
+            "transactionAmount" => 10
+        ];
+
+        $response = $client->request('POST', 'https://api.instantpay.in/marketplace/utilityPayments/prePaymentEnquiry', [
+            'headers' => $headers,
+            'json' => $data,
+        ]);
+
+        $responseBody = $response->getBody()->getContents();
+        $responseBody = json_decode($responseBody, true);
+
+        return $responseBody;
     }
 }

@@ -48,46 +48,7 @@
                                     <input type="hidden" name="id" value="{{ $service->id }}">
                                     <div class="investment-information m--10">
 
-                                        @if ($service->select_field && $service->category->field_name)
-                                            @php
-                                                $array = json_decode($service->select_field, true);
-                                                $fieldName = array_keys($array);
-                                                $fieldName = implode(' ', $fieldName);
-                                                $options = $array[$fieldName];
-                                            @endphp
-                                            <div class="investment-information-group">
-                                                <label class="invest-label">
-                                                    {{ ucfirst(__($fieldName)) }}
-                                                    <span class="">*</span>
-                                                </label>
-                                                <div class="investment-inner-group form-group">
-                                                    <select name="{{ $fieldName }}" required="" class="form-control"
-                                                        id="operator-select">
-                                                        <option value="">---@lang('Select ') {{ __($fieldName) }}---
-                                                        </option>
-                                                        @foreach ($operator as $data)
-                                                            <option value="{{ $data['billerId'] }}">
-                                                                {{ ucfirst(__($data['billerName'])) }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            </div>
 
-                                            <div class="investment-information-group">
-                                                <label class="invest-label">
-                                                    {{ ucfirst(__('Plans')) }}
-                                                    <span class="">*</span>
-                                                </label>
-                                                <div class="investment-inner-group form-group">
-                                                    <select name="amount" required="" class="form-control"
-                                                        id="plan-select">
-                                                        <option value="">---@lang('Select ') {{ __('Plans') }}---
-                                                        </option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        @endif
                                         @if ($service->id == 1)
                                             <div class="investment-information-group">
                                                 <label class="invest-label">
@@ -119,6 +80,78 @@
                                                         <option value="">---@lang('Select ') {{ __('Plans') }}---
                                                         </option>
                                                     </select>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        @if ($service->id == 5)
+                                            <div class="investment-information-group">
+                                                <label class="invest-label">
+                                                    {{ ucfirst(__('Operator')) }}
+                                                    <span class="">*</span>
+                                                </label>
+                                                <div class="investment-inner-group form-group">
+                                                    <select name="{{ 'Operator' }}" required="" class="form-control"
+                                                        id="operator-select">
+                                                        <option value="">---@lang('Select ') {{ __('Operator') }}---
+                                                        </option>
+                                                        @foreach ($operator as $data)
+                                                            <option value="{{ $data['billerId'] }}">
+                                                                {{ ucfirst(__($data['billerName'])) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        @if ($service->id == 3)
+                                            <div class="investment-information-group">
+                                                <label class="invest-label">
+                                                    {{ ucfirst(__('Operator')) }}
+                                                    <span class="">*</span>
+                                                </label>
+                                                <div class="investment-inner-group form-group">
+                                                    <select name="{{ 'Operator' }}" required="" class="form-control"
+                                                        id="operator-select">
+                                                        <option value="">---@lang('Select ') {{ __('Operator') }}---
+                                                        </option>
+                                                        @foreach ($operator as $data)
+                                                            <option value="{{ $data['billerId'] }}">
+                                                                {{ ucfirst(__($data['billerName'])) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        @if ($service->id == 6)
+                                            <div class="investment-information-group">
+                                                <label class="invest-label">
+                                                    {{ ucfirst(__('Operator')) }}
+                                                    <span class="">*</span>
+                                                </label>
+                                                <div class="investment-inner-group form-group">
+                                                    <select name="{{ 'Operator' }}" required="" class="form-control">
+                                                        <option value="">---@lang('Select ') {{ __('Operator') }}---
+                                                        </option>
+                                                        @foreach ($operator as $data)
+                                                            <option value="{{ $data['billerId'] }}">
+                                                                {{ ucfirst(__($data['billerName'])) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="investment-information-group">
+                                                <label class="invest-label">
+                                                    {{ ucfirst(__('Meter Number')) }}
+                                                    <span class="">*</span>
+                                                </label>
+                                                <div class="investment-inner-group form-group">
+                                                    <input type="text" name="meter" class="form-control"
+                                                        placeholder="Meter Number">
+                                                    <div id="meter-error" style="color: red; display: none;"></div>
                                                 </div>
                                             </div>
                                         @endif
@@ -281,37 +314,87 @@
         })(jQuery);
     </script>
 
+    @if ($service->id == 1)
+        <script>
+            // Attach an event listener to the operator select box
+            $('#operator-select').on('change', function() {
+                var selectedOperator = $(this).val();
+                $('.preloader').css('display', 'block').animate({
+                    opacity: 1
+                });
+                $.ajax({
+                    type: 'GET',
+                    url: "{{ url('/getRechargePlan') }}",
+                    data: {
+                        operator: selectedOperator
+                    },
+                    success: function(data) {
+                        $('.preloader').animate({
+                            opacity: 0
+                        }, 500, function() {
+                            $(this).css('display', 'none'); // Hide the preloader
+                        });
+                        var plansSelect = $('#plan-select');
+                        plansSelect.empty();
+
+                        $.each(data, function(index, plan) {
+                            var displayText = 'Rs. ' + plan.planAmount;
+                            if (plan.dataBenefits) {
+                                displayText += ' | Data: ' + plan.dataBenefits;
+                            }
+                            if (plan.planValidity) {
+                                displayText += ' | Validity: ' + plan.planValidity;
+                            }
+                            plansSelect.append($('<option></option>').attr('value', plan.planAmount)
+                                .text(displayText));
+                        });
+                    },
+                    error: function(error) {
+                        console.error('Error fetching plans:', error);
+                    }
+                });
+            });
+        </script>
+    @endif
 
     <script>
-        // Attach an event listener to the operator select box
-        $('#operator-select').on('change', function() {
-            var selectedOperator = $(this).val();
-
-            $.ajax({
-                type: 'GET',
-                url: "{{ url('/getRechargePlan') }}",
-                data: {
-                    operator: selectedOperator
-                },
-                success: function(data) {
-                    var plansSelect = $('#plan-select');
-                    plansSelect.empty();
-
-                    $.each(data, function(index, plan) {
-                        var displayText = 'Rs. ' + plan.planAmount;
-                        if (plan.dataBenefits) {
-                            displayText += ' | Data: ' + plan.dataBenefits;
+        $(document).ready(function() {
+            $('input[name="meter"]').on('change', function() {
+                var meterNumber = $('input[name="meter"]').val();
+                var operator = $('select[name="Operator"]').val();
+                $('.preloader').css('display', 'block').animate({
+                    opacity: 1
+                });
+                $.ajax({
+                    url: '{{ url('/getBillEnquiry') }}',
+                    method: 'GET',
+                    data: {
+                        meter: meterNumber,
+                        operator: operator
+                    },
+                    success: function(response) {
+                        $('.preloader').animate({
+                            opacity: 0
+                        }, 500, function() {
+                            $(this).css('display', 'none'); // Hide the preloader
+                        });
+                        if (response.statuscode == 'ERR') {
+                            $('#meter-error').text(response.status).css('display',
+                                'block'); // Display the error message
+                        } else {
+                            $('input[name="meter_number"]').val(response.data
+                                .BillNumber).prop('disabled', true);;
+                            $('input[name="meter_owner_name"]').val(response.data
+                                .CustomerName).prop('disabled', true);;
+                            $('input[name="amount"]').val(response.data
+                                .BillAmount).prop('disabled', true);;
                         }
-                        if (plan.planValidity) {
-                            displayText += ' | Validity: ' + plan.planValidity;
-                        }
-                        plansSelect.append($('<option></option>').attr('value', plan.planAmount)
-                            .text(displayText));
-                    });
-                },
-                error: function(error) {
-                    console.error('Error fetching plans:', error);
-                }
+                        // Handle the response from the API
+                    },
+                    error: function(error) {
+                        // Handle any errors that occur during the API request
+                    }
+                });
             });
         });
     </script>
