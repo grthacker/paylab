@@ -304,4 +304,43 @@ class InstantPayController extends Controller
         $responseData = json_decode($responseBody, true);
         return $responseData;
     }
+
+    public function wallet($data = '')
+    {
+        $client = new Client();
+        $account =  $data['wallet_phone_number']['field_value'];
+        $name =  $data['receiver_name']['field_value'];
+        $headers = [
+            'X-Ipay-Auth-Code' => '1',
+            'X-Ipay-Client-Id' => $this->clientID,
+            'X-Ipay-Client-Secret' => $this->client_secret,
+            'X-Ipay-Endpoint-Ip' => $this->public_ip,
+            'Content-Type' => 'application/json'
+        ];
+
+        $data = [
+            "payer" => [
+                "bankProfileId" => "0",
+                "accountNumber" => "***************"
+            ],
+            "payee" => [
+                "name" => $name,
+                "accountNumber" => "***************",
+
+            ],
+            "transferMode" => "IMPS",
+            "transferAmount" => $account,
+            "externalRef" => "IMPS1",
+            "latitude" => "20.**36",
+            "longitude" => "78.**28",
+        ];
+
+        $response = $client->request('POST', 'https://api.instantpay.in/payments/payout', [
+            'headers' => $headers,
+            'json' => $data,
+        ]);
+
+        $responseBody = $response->getBody()->getContents();
+        $responseData = json_decode($responseBody, true);
+    }
 }

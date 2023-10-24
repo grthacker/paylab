@@ -194,13 +194,15 @@ class ServiceController extends Controller
                 $select = array();
                 $select[str_replace(' ', '_', strtolower($category->field_name))] = $request->select;
             }
-            $bank = new InstantPayController();
-            $bankData  = $bank->banks();
+            if ($request->id == 9) {
+                $bank = new InstantPayController();
+                $bankData  = $bank->banks();
 
-            $bankNames = array_map(function ($item) {
-                return $item['name'];
-            }, $bankData);
-            $select[str_replace(' ', '_', strtolower($category->field_name))] = $bankNames;
+                $bankNames = array_map(function ($item) {
+                    return $item['name'];
+                }, $bankData);
+                $select[str_replace(' ', '_', strtolower($category->field_name))] = $bankNames;
+            }
         }
 
         $user_data = [];
@@ -278,14 +280,14 @@ class ServiceController extends Controller
         if ($service->service_id == 9) {
             $bankTransfer = new InstantPayController();
             $data = json_decode($service->user_data, true);
-            dd($data);
+
             $bankTransfer->bankTransfer($data);
             $user = User::find($service->user_id);
             $service->status = 1;
             $service->admin_feedback = $request->message;
             $service->save();
         } else {
-            dd($service);
+
             $user = User::find($service->user_id);
             $service->status = 1;
             $service->admin_feedback = $request->message;
