@@ -39,26 +39,26 @@ class ForgotPasswordController extends Controller
     {
         if ($request->type == 'email') {
             $validationRule = [
-                'value'=>'required|email'
+                'value' => 'required|email'
             ];
             $validationMessage = [
-                'value.required'=>'Email field is required',
-                'value.email'=>'Email must be an valide email'
+                'value.required' => 'Email field is required',
+                'value.email' => 'Email must be an valide email'
             ];
-        }elseif($request->type == 'username'){
+        } elseif ($request->type == 'username') {
             $validationRule = [
-                'value'=>'required'
+                'value' => 'required'
             ];
-            $validationMessage = ['value.required'=>'Username field is required'];
-        }else{
-            $notify[] = ['error','Invalid selection'];
+            $validationMessage = ['value.required' => 'Username field is required'];
+        } else {
+            $notify[] = ['error', 'Invalid selection'];
             return back()->withNotify($notify);
         }
 
-        $request->validate($validationRule,$validationMessage);
+        $request->validate($validationRule, $validationMessage);
 
         $user = User::where($request->type, $request->value)->first();
-        
+
         if (!$user) {
             $notify[] = ['error', 'User not found.'];
             return back()->withNotify($notify);
@@ -84,25 +84,26 @@ class ForgotPasswordController extends Controller
 
         $page_title = 'Account Recovery';
         $email = $user->email;
-        session()->put('pass_res_mail',$email);
+        session()->put('pass_res_mail', $email);
         $notify[] = ['success', 'Password reset email sent successfully'];
         return redirect()->route('user.password.code_verify')->withNotify($notify);
     }
 
-    public function codeVerify(){
+    public function codeVerify()
+    {
         $page_title = 'Account Recovery';
         $email = session()->get('pass_res_mail');
         if (!$email) {
-            $notify[] = ['error','Opps! session expired'];
+            $notify[] = ['error', 'Opps! session expired'];
             return redirect()->route('user.password.request')->withNotify($notify);
         }
-        return view(activeTemplate().'user.auth.passwords.code_verify',compact('page_title','email'));
+        return view(activeTemplate() . 'user.auth.passwords.code_verify', compact('page_title', 'email'));
     }
 
     public function verifyCode(Request $request)
     {
         $request->validate(['code.*' => 'required', 'email' => 'required']);
-        $code =  str_replace(',','',implode(',',$request->code));
+        $code =  str_replace(',', '', implode(',', $request->code));
 
         if (PasswordReset::where('token', $code)->where('email', $request->email)->count() != 1) {
             $notify[] = ['error', 'Invalid token'];
@@ -112,5 +113,4 @@ class ForgotPasswordController extends Controller
         session()->flash('fpass_email', $request->email);
         return redirect()->route('user.password.reset', $code)->withNotify($notify);
     }
-
 }

@@ -25,7 +25,7 @@ class EmailTemplateController extends Controller
         $email_template = EmailTemplate::findOrFail($id);
         $page_title = $email_template->name;
         $empty_message = 'No shortcode available';
-        return view('admin.email_template.edit', compact('page_title', 'email_template','empty_message'));
+        return view('admin.email_template.edit', compact('page_title', 'email_template', 'empty_message'));
     }
 
     public function update(Request $request, $id)

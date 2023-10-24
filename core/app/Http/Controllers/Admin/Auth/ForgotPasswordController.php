@@ -96,7 +96,7 @@ class ForgotPasswordController extends Controller
         $request->validate(['code.*' => 'required']);
         $notify[] = ['success', 'You can change your password.'];
 
-        $code =  str_replace(',','',implode(',',$request->code));
+        $code =  str_replace(',', '', implode(',', $request->code));
 
         return redirect()->route('admin.password.change-link', $code)->withNotify($notify);
     }

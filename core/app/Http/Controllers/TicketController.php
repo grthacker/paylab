@@ -51,7 +51,7 @@ class TicketController extends Controller
         $message = new SupportMessage();
 
         $files = $request->file('attachments');
-        $allowedExts = array('jpg', 'png', 'jpeg', 'pdf','doc','docx');
+        $allowedExts = array('jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx');
 
 
         $this->validate($request, [
@@ -97,7 +97,7 @@ class TicketController extends Controller
         $adminNotification = new AdminNotification();
         $adminNotification->user_id = $user->id;
         $adminNotification->title = 'New support ticket has opened';
-        $adminNotification->click_url = route('admin.ticket.view',$ticket->id);
+        $adminNotification->click_url = route('admin.ticket.view', $ticket->id);
         $adminNotification->save();
 
 
@@ -126,14 +126,11 @@ class TicketController extends Controller
         $messages = SupportMessage::where('supportticket_id', $my_ticket->id)->latest()->get();
         $user = auth()->user();
 
-        if($user){
-            return view($this->activeTemplate. 'user.support.view', compact('my_ticket', 'messages', 'page_title', 'user'));
-        }else{
-            return view($this->activeTemplate. 'user.ticket', compact('my_ticket', 'messages', 'page_title', 'user'));
+        if ($user) {
+            return view($this->activeTemplate . 'user.support.view', compact('my_ticket', 'messages', 'page_title', 'user'));
+        } else {
+            return view($this->activeTemplate . 'user.ticket', compact('my_ticket', 'messages', 'page_title', 'user'));
         }
-
-        
-
     }
 
     public function replyTicket(Request $request, $id)
@@ -142,7 +139,7 @@ class TicketController extends Controller
         $message = new SupportMessage();
         if ($request->replayTicket == 1) {
             $imgs = $request->file('attachments');
-            $allowedExts = array('jpg', 'png', 'jpeg', 'pdf', 'doc','docx');
+            $allowedExts = array('jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx');
 
             $this->validate($request, [
                 'attachments' => [
@@ -182,7 +179,6 @@ class TicketController extends Controller
                         $attachment->support_message_id = $message->id;
                         $attachment->attachment = uploadFile($file, $path);
                         $attachment->save();
-
                     } catch (\Exception $exp) {
                         $notify[] = ['error', 'Could not upload your ' . $file];
                         return back()->withNotify($notify)->withInput();
@@ -198,7 +194,6 @@ class TicketController extends Controller
             $notify[] = ['success', 'Support ticket closed successfully!'];
         }
         return back()->withNotify($notify);
-
     }
 
 
@@ -211,7 +206,7 @@ class TicketController extends Controller
         $file = $attachment->attachment;
 
         $path = imagePath()['ticket']['path'];
-        $full_path = $path.'/'. $file;
+        $full_path = $path . '/' . $file;
 
         $title = str_slug($attachment->supportMessage->ticket->subject);
         $ext = pathinfo($file, PATHINFO_EXTENSION);
@@ -222,5 +217,4 @@ class TicketController extends Controller
         header("Content-Type: " . $mimetype);
         return readfile($full_path);
     }
-
 }

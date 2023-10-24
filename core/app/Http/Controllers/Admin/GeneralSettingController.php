@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Validator;
 use Image;
- 
+
 class GeneralSettingController extends Controller
 {
     public function index()
@@ -25,7 +25,7 @@ class GeneralSettingController extends Controller
             'secondary_color' => ['nullable', 'regex:/^[a-f0-9]{6}$/i'],
             'upline_ref_sign_up' => ['nullable', 'numeric', 'gte:0'],
         ];
- 
+
         $validator = Validator::make($request->all(), $validation_rule, []);
         $validator->validate();
 

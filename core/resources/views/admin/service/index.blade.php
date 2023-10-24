@@ -7,15 +7,15 @@
                     <div class="table-responsive--md  table-responsive">
                         <table class="table table--light style--two">
                             <thead>
-                            <tr>
-                                <th scope="col">@lang('Category')</th>
-                                <th scope="col">@lang('Service')</th>
-                                <th scope="col">@lang('Processig Time')</th>
-                                <th scope="col">@lang('Fixed Charge')</th>
-                                <th scope="col">@lang('Parcent Charge')</th>
-                                <th scope="col">@lang('Status')</th>
-                                <th scope="col">@lang('Action')</th>
-                            </tr>
+                                <tr>
+                                    <th scope="col">@lang('Category')</th>
+                                    <th scope="col">@lang('Service')</th>
+                                    <th scope="col">@lang('Processig Time')</th>
+                                    <th scope="col">@lang('Fixed Charge')</th>
+                                    <th scope="col">@lang('Parcent Charge')</th>
+                                    <th scope="col">@lang('Status')</th>
+                                    <th scope="col">@lang('Action')</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 @forelse($services as $index => $data)
@@ -37,25 +37,33 @@
                                             {{ getAmount($data->percent_charge) }} @lang('%')
                                         </td>
                                         <td data-label="@lang('Status')">
-                                            @if($data->status == 1)
-                                                <span class="text--small badge font-weight-normal badge--success">@lang('Enable')</span>
+                                            @if ($data->status == 1)
+                                                <span
+                                                    class="text--small badge font-weight-normal badge--success">@lang('Enable')</span>
                                             @else
-                                                <span class="text--small badge font-weight-normal badge--warning">@lang('Disable')</span>
+                                                <span
+                                                    class="text--small badge font-weight-normal badge--warning">@lang('Disable')</span>
                                             @endif
                                         </td>
                                         <td data-label="@lang('Action')">
-                                            <a href="{{ route('admin.service.update.page', $data->id) }}" class="icon-btn eidtBtn" data-toggle="tooltip" data-original-title="@lang('Edit')">
+                                            <a href="{{ route('admin.service.update.page', $data->id) }}"
+                                                class="icon-btn eidtBtn" data-toggle="tooltip"
+                                                data-original-title="@lang('Edit')">
                                                 <i class="la la-pencil"></i>
                                             </a>
 
-                                            @if($data->status == 1)
-                                                <a href="javascript:void(0)" class="icon-btn btn--danger deactivateBtn  ml-1" data-toggle="tooltip" data-original-title="@lang('Disable')" data-id="{{ $data->id }}" data-name="{{ __($data->category->name) }}">
+                                            @if ($data->status == 1)
+                                                <a href="javascript:void(0)"
+                                                    class="icon-btn btn--danger deactivateBtn  ml-1" data-toggle="tooltip"
+                                                    data-original-title="@lang('Disable')" data-id="{{ $data->id }}"
+                                                    data-name="{{ __($data->category->name) }}">
                                                     <i class="la la-eye-slash"></i>
                                                 </a>
                                             @else
                                                 <a href="javascript:void(0)" class="icon-btn btn--success activateBtn  ml-1"
-                                                   data-toggle="tooltip" data-original-title="@lang('Enable')"
-                                                   data-id="{{ $data->id }}" data-name="{{ __($data->category->name) }}">
+                                                    data-toggle="tooltip" data-original-title="@lang('Enable')"
+                                                    data-id="{{ $data->id }}"
+                                                    data-name="{{ __($data->category->name) }}">
                                                     <i class="la la-eye"></i>
                                                 </a>
                                             @endif
@@ -127,28 +135,28 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @push('breadcrumb-plugins')
-    <a class="btn btn-sm btn--primary box--shadow1 text--small" href="{{ route('admin.service.page') }}"><i class="fa fa-fw fa-plus"></i>@lang('Add New')</a>
+    <a class="btn btn-sm btn--primary box--shadow1 text--small" href="{{ route('admin.service.page') }}"><i
+            class="fa fa-fw fa-plus"></i>@lang('Add New')</a>
 @endpush
 
 
 @push('script')
     <script>
-        (function($){
+        (function($) {
 
             "use strict";
 
-            $('.activateBtn').on('click', function () {
+            $('.activateBtn').on('click', function() {
                 var modal = $('#activateModal');
                 modal.find('.method-name').text($(this).data('name'));
                 modal.find('input[name=id]').val($(this).data('id'));
                 modal.modal('show');
             });
 
-            $('.deactivateBtn').on('click', function () {
+            $('.deactivateBtn').on('click', function() {
                 var modal = $('#deactivateModal');
                 modal.find('.method-name').text($(this).data('name'));
                 modal.find('input[name=id]').val($(this).data('id'))

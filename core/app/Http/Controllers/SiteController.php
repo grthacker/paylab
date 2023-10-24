@@ -193,7 +193,7 @@ class SiteController extends Controller
     }
 
     public function subscribe(Request $request){
-        
+
         if(!$request->isMethod('post')){
             $notify = ['success'=> false, 'message'=>'Your request is invalid'];
             return response()->json($notify);

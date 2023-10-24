@@ -56,7 +56,7 @@ class ResetPasswordController extends Controller
 
         session()->put('fpass_email', $request->email);
         $request->validate($this->rules(), $this->validationErrorMessages());
-        $general = GeneralSetting::first(['en', 'sn','secure_password']);
+        $general = GeneralSetting::first(['en', 'sn', 'secure_password']);
         if ($general->secure_password) {
             $notify = $this->strongPassCheck($request->password);
             if ($notify) {
@@ -106,25 +106,25 @@ class ResetPasswordController extends Controller
     }
 
 
-    protected function strongPassCheck($password){
+    protected function strongPassCheck($password)
+    {
         $password = $password;
         $capital = '/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]/';
-        $capital = preg_match($capital,$password);
+        $capital = preg_match($capital, $password);
         $notify = null;
         if (!$capital) {
-            $notify[] = ['error','Minimum 1 capital word is required'];
+            $notify[] = ['error', 'Minimum 1 capital word is required'];
         }
         $number = '/[1234567890]/';
-        $number = preg_match($number,$password);
+        $number = preg_match($number, $password);
         if (!$number) {
-            $notify[] = ['error','Minimum 1 number is required'];
+            $notify[] = ['error', 'Minimum 1 number is required'];
         }
         $special = '/[`!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?~\']/';
-        $special = preg_match($special,$password);
+        $special = preg_match($special, $password);
         if (!$special) {
-            $notify[] = ['error','Minimum 1 special character is required'];
+            $notify[] = ['error', 'Minimum 1 special character is required'];
         }
         return $notify;
     }
-
 }

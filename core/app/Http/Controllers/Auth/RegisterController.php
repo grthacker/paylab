@@ -56,7 +56,7 @@ class RegisterController extends Controller
         session()->put('reference', $reference);
         $info = json_decode(json_encode(getIpInfo()), true);
         $country_code = @implode(',', $info['code']);
-        return view($this->activeTemplate . 'user.auth.register', compact('reference', 'page_title','country_code'));
+        return view($this->activeTemplate . 'user.auth.register', compact('reference', 'page_title', 'country_code'));
     }
 
     public function showRegistrationForm()
@@ -64,7 +64,7 @@ class RegisterController extends Controller
         $page_title = "Sign Up";
         $info = json_decode(json_encode(getIpInfo()), true);
         $country_code = @implode(',', $info['code']);
-        return view($this->activeTemplate . 'user.auth.register', compact('page_title','country_code'));
+        return view($this->activeTemplate . 'user.auth.register', compact('page_title', 'country_code'));
     }
 
 
@@ -102,7 +102,7 @@ class RegisterController extends Controller
             }
         }
 
-        $exist = User::where('mobile',$request->country_code.$request->mobile)->first();
+        $exist = User::where('mobile', $request->country_code . $request->mobile)->first();
         if ($exist) {
             $notify[] = ['error', 'Mobile number already exist'];
             return back()->withNotify($notify)->withInput();
@@ -139,7 +139,6 @@ class RegisterController extends Controller
         $referBy = session()->get('reference');
         if ($referBy != null) {
             $referUser = User::where('username', $referBy)->first();
-
         } else {
             $referUser = null;
         }
@@ -153,7 +152,7 @@ class RegisterController extends Controller
         $user->password = Hash::make($data['password']);
         $user->username = trim($data['username']);
         $user->ref_by = ($referUser != null) ? $referUser->id : null;
-        $user->mobile = $data['country_code'].$data['mobile'];
+        $user->mobile = $data['country_code'] . $data['mobile'];
         $user->address = [
             'address' => '',
             'state' => '',
@@ -168,9 +167,9 @@ class RegisterController extends Controller
         $user->tv = 1;
         $user->save();
 
-        if($user->ref_by){
+        if ($user->ref_by) {
 
-            if($gnl->upline_ref_sign_up != 0){
+            if ($gnl->upline_ref_sign_up != 0) {
                 $getUpline = User::find($user->ref_by);
                 $getUpline->balance += $gnl->upline_ref_sign_up;
                 $getUpline->save();
@@ -185,20 +184,19 @@ class RegisterController extends Controller
                 $transaction->trx =  getTrx();
                 $transaction->save();
             }
- 
         }
-        
+
 
         $adminNotification = new AdminNotification();
         $adminNotification->user_id = $user->id;
         $adminNotification->title = 'New member registered';
-        $adminNotification->click_url = route('admin.users.detail',$user->id);
+        $adminNotification->click_url = route('admin.users.detail', $user->id);
         $adminNotification->save();
 
 
         //Login Log Create
         $ip = $_SERVER["REMOTE_ADDR"];
-        $exist = UserLogin::where('user_ip',$ip)->first();
+        $exist = UserLogin::where('user_ip', $ip)->first();
         $userLogin = new UserLogin();
 
         //Check exist or not
@@ -208,12 +206,12 @@ class RegisterController extends Controller
             $userLogin->location =  $exist->location;
             $userLogin->country_code = $exist->country_code;
             $userLogin->country =  $exist->country;
-        }else{
+        } else {
             $info = json_decode(json_encode(getIpInfo()), true);
-            $userLogin->longitude =  @implode(',',$info['long']);
-            $userLogin->latitude =  @implode(',',$info['lat']);
-            $userLogin->location =  @implode(',',$info['city']) . (" - ". @implode(',',$info['area']) ."- ") . @implode(',',$info['country']) . (" - ". @implode(',',$info['code']) . " ");
-            $userLogin->country_code = @implode(',',$info['code']);
+            $userLogin->longitude =  @implode(',', $info['long']);
+            $userLogin->latitude =  @implode(',', $info['lat']);
+            $userLogin->location =  @implode(',', $info['city']) . (" - " . @implode(',', $info['area']) . "- ") . @implode(',', $info['country']) . (" - " . @implode(',', $info['code']) . " ");
+            $userLogin->country_code = @implode(',', $info['code']);
             $userLogin->country =  @implode(',', $info['country']);
         }
 
@@ -229,23 +227,24 @@ class RegisterController extends Controller
         return $user;
     }
 
-    protected function strongPassCheck($password){
+    protected function strongPassCheck($password)
+    {
         $password = $password;
         $capital = '/[ABCDEFGHIJKLMNOPQRSTUVWXYZ]/';
-        $capital = preg_match($capital,$password);
+        $capital = preg_match($capital, $password);
         $notify = null;
         if (!$capital) {
-            $notify[] = ['error','Minimum 1 capital word is required'];
+            $notify[] = ['error', 'Minimum 1 capital word is required'];
         }
         $number = '/[1234567890]/';
-        $number = preg_match($number,$password);
+        $number = preg_match($number, $password);
         if (!$number) {
-            $notify[] = ['error','Minimum 1 number is required'];
+            $notify[] = ['error', 'Minimum 1 number is required'];
         }
         $special = '/[`!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?~\']/';
-        $special = preg_match($special,$password);
+        $special = preg_match($special, $password);
         if (!$special) {
-            $notify[] = ['error','Minimum 1 special character is required'];
+            $notify[] = ['error', 'Minimum 1 special character is required'];
         }
         return $notify;
     }
@@ -254,5 +253,4 @@ class RegisterController extends Controller
     {
         return redirect()->route('user.home');
     }
-
 }

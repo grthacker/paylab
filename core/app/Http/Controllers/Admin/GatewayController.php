@@ -241,5 +241,4 @@ class GatewayController extends Controller
     {
         return ucwords(str_replace('_', ' ', $key));
     }
-
 }

@@ -21,7 +21,7 @@ class LanguageController extends Controller
         $languages = Language::orderByDesc('is_default')->get();
         $path = imagePath()['language']['path'];
         $size = imagePath()['language']['size'];
-        return view('admin.language.lang', compact('page_title', 'empty_message', 'languages','path','size'));
+        return view('admin.language.lang', compact('page_title', 'empty_message', 'languages', 'path', 'size'));
     }
 
     public function langStore(Request $request)
@@ -66,7 +66,7 @@ class LanguageController extends Controller
         $la = new Language();
         $la = Language::findOrFail($id);
 
-       
+
 
         if ($request->is_default) {
             $lang = $la->where('is_default', 1)->first();
@@ -174,10 +174,9 @@ class LanguageController extends Controller
             $itemsss = json_decode($items, true);
             $result = array_merge($itemsss, $newArr);
             file_put_contents(resource_path('lang/') . $la->code . '.json', json_encode($result));
-            $notify[] = ['success', "`".trim($request->key)."` has been added"];
+            $notify[] = ['success', "`" . trim($request->key) . "` has been added"];
             return back()->withNotify($notify);
         }
-
     }
     public function deleteLanguageJson(Request $request, $id)
     {
@@ -194,8 +193,8 @@ class LanguageController extends Controller
         $json_arr = json_decode($data, true);
         unset($json_arr[$reqkey]);
 
-        file_put_contents(resource_path('lang/'). $lang->code . '.json', json_encode($json_arr));
-        $notify[] = ['success', "`".trim($request->key)."` has been removed"];
+        file_put_contents(resource_path('lang/') . $lang->code . '.json', json_encode($json_arr));
+        $notify[] = ['success', "`" . trim($request->key) . "` has been removed"];
         return back()->withNotify($notify);
     }
     public function updateLanguageJson(Request $request, $id)
@@ -215,10 +214,9 @@ class LanguageController extends Controller
 
         $json_arr[$reqkey] = $reqValue;
 
-        file_put_contents(resource_path('lang/'). $lang->code . '.json', json_encode($json_arr));
+        file_put_contents(resource_path('lang/') . $lang->code . '.json', json_encode($json_arr));
 
         $notify[] = ['success', "Update successfully"];
         return back()->withNotify($notify);
     }
-
 }

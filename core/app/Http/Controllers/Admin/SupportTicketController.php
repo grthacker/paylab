@@ -17,15 +17,15 @@ class SupportTicketController extends Controller
         $page_title = 'Support Tickets';
         $empty_message = 'No Data found.';
         $items = SupportTicket::latest()->with('user')->paginate(getPaginate());
-        return view('admin.support.tickets', compact('items', 'page_title','empty_message'));
+        return view('admin.support.tickets', compact('items', 'page_title', 'empty_message'));
     }
 
     public function pendingTicket()
     {
         $page_title = 'Pending Tickets';
         $empty_message = 'No Data found.';
-        $items = SupportTicket::whereIn('status', [0,2])->latest()->with('user')->paginate(getPaginate());
-        return view('admin.support.tickets', compact('items', 'page_title','empty_message'));
+        $items = SupportTicket::whereIn('status', [0, 2])->latest()->with('user')->paginate(getPaginate());
+        return view('admin.support.tickets', compact('items', 'page_title', 'empty_message'));
     }
 
     public function closedTicket()
@@ -33,7 +33,7 @@ class SupportTicketController extends Controller
         $empty_message = 'No Data found.';
         $page_title = 'Closed Tickets';
         $items = SupportTicket::whereIn('status', [3])->latest()->with('user')->paginate(getPaginate());
-        return view('admin.support.tickets', compact('items', 'page_title','empty_message'));
+        return view('admin.support.tickets', compact('items', 'page_title', 'empty_message'));
     }
 
     public function answeredTicket()
@@ -41,7 +41,7 @@ class SupportTicketController extends Controller
         $page_title = 'Answered Tickets';
         $empty_message = 'No Data found.';
         $items = SupportTicket::latest()->with('user')->whereIN('status', [1])->paginate(getPaginate());
-        return view('admin.support.tickets', compact('items', 'page_title','empty_message'));
+        return view('admin.support.tickets', compact('items', 'page_title', 'empty_message'));
     }
 
 
@@ -110,11 +110,10 @@ class SupportTicketController extends Controller
                 'ticket_id' => $ticket->ticket,
                 'ticket_subject' => $ticket->subject,
                 'reply' => $request->message,
-                'link' => route('ticket.view',$ticket->ticket),
+                'link' => route('ticket.view', $ticket->ticket),
             ]);
 
             $notify[] = ['success', "Support ticket replied successfully"];
-
         } elseif ($request->replayTicket == 2) {
             $ticket->status = 3;
             $ticket->save();
@@ -132,8 +131,8 @@ class SupportTicketController extends Controller
 
         $path = imagePath()['ticket']['path'];
 
-        $full_path = $path.'/' . $file;
-        $title = str_slug($attachment->supportMessage->ticket->subject).'-'.$file;
+        $full_path = $path . '/' . $file;
+        $title = str_slug($attachment->supportMessage->ticket->subject) . '-' . $file;
         $ext = pathinfo($file, PATHINFO_EXTENSION);
         $mimetype = mime_content_type($full_path);
         header('Content-Disposition: attachment; filename="' . $title);
@@ -146,14 +145,12 @@ class SupportTicketController extends Controller
         $path = imagePath()['ticket']['path'];
         if ($message->attachments()->count() > 0) {
             foreach ($message->attachments as $img) {
-                @unlink($path.'/'.$img->image);
+                @unlink($path . '/' . $img->image);
                 $img->delete();
             }
         }
         $message->delete();
         $notify[] = ['success', "Delete Successfully"];
         return back()->withNotify($notify);
-
     }
-
 }

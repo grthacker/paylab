@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Models\GeneralSetting;
@@ -78,13 +79,15 @@ class LoginController extends Controller
         }
         $gnl->save();
 
-//
+        //
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
-        if (method_exists($this, 'hasTooManyLoginAttempts') &&
-            $this->hasTooManyLoginAttempts($request)) {
+        if (
+            method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)
+        ) {
             $this->fireLockoutEvent($request);
             return $this->sendLockoutResponse($request);
         }

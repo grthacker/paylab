@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Deposit;
@@ -114,12 +115,12 @@ class ManageUsersController extends Controller
     {
         $page_title = 'User Detail';
         $user = User::findOrFail($id);
-        $totalDeposit = Deposit::where('user_id',$user->id)->where('status',1)->sum('amount');
-        $totalTransaction = Transaction::where('user_id',$user->id)->count();
+        $totalDeposit = Deposit::where('user_id', $user->id)->where('status', 1)->sum('amount');
+        $totalTransaction = Transaction::where('user_id', $user->id)->count();
         $countService = ApplyService::where('user_id', $id)->where('status', '!=', 0)->count();
         $upline = User::find($user->ref_by);
         $countDownline = User::where('ref_by', $user->id)->count();
-        return view('admin.users.detail', compact('page_title', 'user','totalDeposit','totalTransaction', 'countService', 'upline', 'countDownline'));
+        return view('admin.users.detail', compact('page_title', 'user', 'totalDeposit', 'totalTransaction', 'countService', 'upline', 'countDownline'));
     }
 
 
@@ -147,12 +148,12 @@ class ManageUsersController extends Controller
         $user->lastname = $request->lastname;
         $user->email = $request->email;
         $user->address = [
-                            'address' => $request->address,
-                            'city' => $request->city,
-                            'state' => $request->state,
-                            'zip' => $request->zip,
-                            'country' => $request->country,
-                        ];
+            'address' => $request->address,
+            'city' => $request->city,
+            'state' => $request->state,
+            'zip' => $request->zip,
+            'country' => $request->country,
+        ];
         $user->status = $request->status ? 1 : 0;
         $user->ev = $request->ev ? 1 : 0;
         $user->sv = $request->sv ? 1 : 0;
@@ -170,7 +171,7 @@ class ManageUsersController extends Controller
 
         $user = User::findOrFail($id);
         $amount = getAmount($request->amount);
-        $general = GeneralSetting::first(['cur_text','cur_sym']);
+        $general = GeneralSetting::first(['cur_text', 'cur_sym']);
         $trx = getTrx();
 
         if ($request->act) {
@@ -196,7 +197,6 @@ class ManageUsersController extends Controller
                 'currency' => $general->cur_text,
                 'post_balance' => getAmount($user->balance),
             ]);
-
         } else {
             if ($amount > $user->balance) {
                 $notify[] = ['error', $user->username . ' has insufficient balance.'];
@@ -286,40 +286,41 @@ class ManageUsersController extends Controller
             $page_title = 'Search User Deposits : ' . $user->username;
             $deposits = $user->deposits()->where('trx', $search)->latest()->paginate(getPaginate());
             $empty_message = 'No deposits';
-            return view('admin.deposit.log', compact('page_title', 'search', 'user', 'deposits', 'empty_message','userId'));
+            return view('admin.deposit.log', compact('page_title', 'search', 'user', 'deposits', 'empty_message', 'userId'));
         }
 
         $page_title = 'User Deposit : ' . $user->username;
         $deposits = $user->deposits()->latest()->paginate(getPaginate());
         $empty_message = 'No deposits';
         $scope = 'all';
-        return view('admin.deposit.log', compact('page_title', 'user', 'deposits', 'empty_message','userId','scope'));
+        return view('admin.deposit.log', compact('page_title', 'user', 'deposits', 'empty_message', 'userId', 'scope'));
     }
 
 
-    public function depViaMethod($method, $userId , $type = null){
-        $method = Gateway::where('alias',$method)->firstOrFail();
+    public function depViaMethod($method, $userId, $type = null)
+    {
+        $method = Gateway::where('alias', $method)->firstOrFail();
         $user = User::findOrFail($userId);
         if ($type == 'approved') {
-            $page_title = 'Approved Payment Via '.$method->name;
-            $deposits = Deposit::where('method_code','>=',1000)->where('user_id',$user->id)->where('method_code',$method->code)->where('status', 1)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
-        }elseif($type == 'rejected'){
-            $page_title = 'Rejected Payment Via '.$method->name;
-            $deposits = Deposit::where('method_code','>=',1000)->where('user_id',$user->id)->where('method_code',$method->code)->where('status', 3)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
-        }elseif($type == 'successful'){
-            $page_title = 'Successful Payment Via '.$method->name;
-            $deposits = Deposit::where('status', 1)->where('user_id',$user->id)->where('method_code',$method->code)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
-        }elseif($type == 'pending'){
-            $page_title = 'Pending Payment Via '.$method->name;
-            $deposits = Deposit::where('method_code','>=',1000)->where('user_id',$user->id)->where('method_code',$method->code)->where('status', 2)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
-        }else{
-            $page_title = 'Payment Via '.$method->name;
-            $deposits = Deposit::where('status','!=',0)->where('user_id',$user->id)->where('method_code',$method->code)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
+            $page_title = 'Approved Payment Via ' . $method->name;
+            $deposits = Deposit::where('method_code', '>=', 1000)->where('user_id', $user->id)->where('method_code', $method->code)->where('status', 1)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
+        } elseif ($type == 'rejected') {
+            $page_title = 'Rejected Payment Via ' . $method->name;
+            $deposits = Deposit::where('method_code', '>=', 1000)->where('user_id', $user->id)->where('method_code', $method->code)->where('status', 3)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
+        } elseif ($type == 'successful') {
+            $page_title = 'Successful Payment Via ' . $method->name;
+            $deposits = Deposit::where('status', 1)->where('user_id', $user->id)->where('method_code', $method->code)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
+        } elseif ($type == 'pending') {
+            $page_title = 'Pending Payment Via ' . $method->name;
+            $deposits = Deposit::where('method_code', '>=', 1000)->where('user_id', $user->id)->where('method_code', $method->code)->where('status', 2)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
+        } else {
+            $page_title = 'Payment Via ' . $method->name;
+            $deposits = Deposit::where('status', '!=', 0)->where('user_id', $user->id)->where('method_code', $method->code)->latest()->with(['user', 'gateway'])->paginate(getPaginate());
         }
-        $page_title = 'Deposit History: '.$user->username.' Via '.$method->name;
+        $page_title = 'Deposit History: ' . $user->username . ' Via ' . $method->name;
         $methodAlias = $method->alias;
         $empty_message = 'Deposit Log';
-        return view('admin.deposit.log', compact('page_title', 'empty_message', 'deposits','methodAlias','userId'));
+        return view('admin.deposit.log', compact('page_title', 'empty_message', 'deposits', 'methodAlias', 'userId'));
     }
 
 
@@ -345,27 +346,22 @@ class ManageUsersController extends Controller
         return back()->withNotify($notify);
     }
 
-    public function services($id){
+    public function services($id)
+    {
         $services = ApplyService::where('status', '!=', 0)->where('user_id', $id)->latest()->paginate(getPaginate());
         $user = User::findOrFail($id);
-        $page_title = 'All Services : '.$user->fullname;
+        $page_title = 'All Services : ' . $user->fullname;
         $empty_message = 'Data Not Found';
         return view('admin.users.services', compact('page_title', 'services', 'empty_message', 'user'));
     }
 
-    public function downlines($id){
+    public function downlines($id)
+    {
 
         $user = User::findOrFail($id);
         $downlines = User::where('ref_by', $id)->latest()->paginate(getPaginate());
-        $page_title = 'Downlines of '.$user->fullname;
+        $page_title = 'Downlines of ' . $user->fullname;
         $empty_message = 'Downline Not Found';
         return view('admin.users.downlines', compact('page_title', 'downlines', 'empty_message'));
-
     }
-
-
-
-
-
-
 }

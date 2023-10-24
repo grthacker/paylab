@@ -15,7 +15,7 @@ class ManualGatewayController extends Controller
         $page_title = 'Manual Deposit Methods';
         $gateways = Gateway::manual()->latest()->get();
         $empty_message = 'No deposit methods available.';
-        return view('admin.gateway_manual.list', compact('page_title', 'gateways','empty_message'));
+        return view('admin.gateway_manual.list', compact('page_title', 'gateways', 'empty_message'));
     }
 
     public function create()
@@ -74,7 +74,7 @@ class ManualGatewayController extends Controller
         $method = new Gateway();
         $method->code = $method_code;
         $method->name = $request->name;
-        $method->alias = strtolower(trim(str_replace(' ','_',$request->name)));
+        $method->alias = strtolower(trim(str_replace(' ', '_', $request->name)));
         $method->image = $filename;
         $method->status = 0;
         $method->parameters = json_encode([]);
@@ -86,7 +86,7 @@ class ManualGatewayController extends Controller
 
         $method->single_currency()->save(new GatewayCurrency([
             'name' => $request->name,
-            'gateway_alias' => strtolower(trim(str_replace(' ','_',$request->name))),
+            'gateway_alias' => strtolower(trim(str_replace(' ', '_', $request->name))),
             'currency' => $request->currency,
             'symbol' => '',
             'min_amount' => $request->min_limit,
@@ -156,7 +156,7 @@ class ManualGatewayController extends Controller
         }
 
         $method->name = $request->name;
-        $method->alias = strtolower(trim(str_replace(' ','_',$request->name)));
+        $method->alias = strtolower(trim(str_replace(' ', '_', $request->name)));
         $method->image = $filename;
         $method->parameters = json_encode([]);
         $method->supported_currencies = json_encode([]);
@@ -169,7 +169,7 @@ class ManualGatewayController extends Controller
         $single_currency = $method->single_currency;
 
         $single_currency->name = $request->name;
-        $single_currency->gateway_alias = strtolower(trim(str_replace(' ','_',$method->name)));
+        $single_currency->gateway_alias = strtolower(trim(str_replace(' ', '_', $method->name)));
         $single_currency->currency = $request->currency;
         $single_currency->symbol = '';
         $single_currency->min_amount = $request->min_limit;
@@ -182,7 +182,7 @@ class ManualGatewayController extends Controller
         $single_currency->save();
 
         $notify[] = ['success', $method->name . ' Manual Gateway has been updated.'];
-        return redirect()->route('admin.gateway.manual.edit',[$method->alias])->withNotify($notify);
+        return redirect()->route('admin.gateway.manual.edit', [$method->alias])->withNotify($notify);
     }
 
     public function activate(Request $request)

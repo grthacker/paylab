@@ -30,7 +30,7 @@ class AdminController extends Controller
         $widget['verified_users'] = User::where('status', 1)->count();
         $widget['email_unverified_users'] = User::where('ev', 0)->count();
         $widget['sms_unverified_users'] = User::where('sv', 0)->count();
-        
+
         $widget['count_ticket'] = SupportTicket::count();
 
         $widget['total_service'] = Service::count();
@@ -40,14 +40,14 @@ class AdminController extends Controller
         $widget['count_total_applied_service'] = ApplyService::where('status', '!=', 0)->count();
 
         $widget['popular_service'] = ApplyService::groupBy('service_id')
-                                                 ->selectRaw('service_id, count(service_id) as sum')
-                                                 ->orderBy('sum', 'DESC')->first();
+            ->selectRaw('service_id, count(service_id) as sum')
+            ->orderBy('sum', 'DESC')->first();
 
         $widget['top_depositor'] = Deposit::where('status', 1)->groupBy('user_id')
-                                          ->selectRaw('user_id, sum(amount) as amount')
-                                          ->orderBy('amount', 'DESC')->first();
+            ->selectRaw('user_id, sum(amount) as amount')
+            ->orderBy('amount', 'DESC')->first();
 
- 
+
         // Monthly Deposit Report Graph
         $report['months'] = collect([]);
         $report['deposit_month_amount'] = collect([]);
@@ -80,15 +80,15 @@ class AdminController extends Controller
         })->sort()->reverse()->take(5);
 
 
-        $payment['total_deposit_amount'] = Deposit::where('status',1)->sum('amount');
-        $payment['total_deposit_charge'] = Deposit::where('status',1)->sum('charge');
-        $payment['total_deposit_pending'] = Deposit::where('status',2)->count();
-        $payment['total_deposit'] = Deposit::where('status',1)->count();
+        $payment['total_deposit_amount'] = Deposit::where('status', 1)->sum('amount');
+        $payment['total_deposit_charge'] = Deposit::where('status', 1)->sum('charge');
+        $payment['total_deposit_pending'] = Deposit::where('status', 2)->count();
+        $payment['total_deposit'] = Deposit::where('status', 1)->count();
 
 
         $latestUser = User::latest()->limit(6)->get();
         $empty_message = 'User Not Found';
-        return view('admin.dashboard', compact('page_title', 'widget', 'report', 'deposits', 'chart','payment','latestUser','empty_message'));
+        return view('admin.dashboard', compact('page_title', 'widget', 'report', 'deposits', 'chart', 'payment', 'latestUser', 'empty_message'));
     }
 
 
@@ -152,19 +152,19 @@ class AdminController extends Controller
         return redirect()->route('admin.password')->withNotify($notify);
     }
 
-    public function notifications(){
-        $notifications = AdminNotification::orderBy('id','desc')->paginate(getPaginate());
+    public function notifications()
+    {
+        $notifications = AdminNotification::orderBy('id', 'desc')->paginate(getPaginate());
         $page_title = 'Notifications';
-        return view('admin.notifications',compact('page_title','notifications'));
+        return view('admin.notifications', compact('page_title', 'notifications'));
     }
 
 
-    public function notificationRead($id){
+    public function notificationRead($id)
+    {
         $notification = AdminNotification::findOrFail($id);
         $notification->read_status = 1;
         $notification->save();
         return redirect($notification->click_url);
     }
-
-
 }

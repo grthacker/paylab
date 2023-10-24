@@ -22,7 +22,7 @@ class SmsTemplateController extends Controller
         $sms_template = SmsTemplate::findOrFail($id);
         $page_title = $sms_template->name;
         $empty_message = 'No shortcode available';
-        return view('admin.sms_template.edit', compact('page_title', 'sms_template','empty_message'));
+        return view('admin.sms_template.edit', compact('page_title', 'sms_template', 'empty_message'));
     }
 
     public function update(Request $request, $id)

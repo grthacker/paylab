@@ -35,7 +35,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-//    protected $redirectTo = RouteServiceProvider::HOME;
+    //    protected $redirectTo = RouteServiceProvider::HOME;
     protected $redirectTo = 'user/dashboard';
 
     protected $username;
@@ -49,7 +49,7 @@ class LoginController extends Controller
 
     public function __construct()
     {
-        $this->middleware('guest')->except('logout','logoutGet');
+        $this->middleware('guest')->except('logout', 'logoutGet');
         $this->username = $this->findUsername();
     }
 
@@ -66,9 +66,9 @@ class LoginController extends Controller
 
         $this->validateLogin($request);
 
-        if(isset($request->captcha)){
-            if(!captchaVerify($request->captcha, $request->captcha_secret)){
-                $notify[] = ['error',"Invalid Captcha"];
+        if (isset($request->captcha)) {
+            if (!captchaVerify($request->captcha, $request->captcha_secret)) {
+                $notify[] = ['error', "Invalid Captcha"];
                 return back()->withNotify($notify)->withInput();
             }
         }
@@ -122,7 +122,6 @@ class LoginController extends Controller
         }
 
         $request->validate($validation_rule);
-
     }
 
     public function logout()
@@ -151,7 +150,7 @@ class LoginController extends Controller
         $user->tv = $user->ts == 1 ? 0 : 1;
         $user->save();
         $ip = $_SERVER["REMOTE_ADDR"];
-        $exist = UserLogin::where('user_ip',$ip)->first();
+        $exist = UserLogin::where('user_ip', $ip)->first();
         $userLogin = new UserLogin();
         if ($exist) {
             $userLogin->longitude =  $exist->longitude;
@@ -159,25 +158,23 @@ class LoginController extends Controller
             $userLogin->location =  $exist->location;
             $userLogin->country_code = $exist->country_code;
             $userLogin->country =  $exist->country;
-        }else{
+        } else {
             $info = json_decode(json_encode(getIpInfo()), true);
-            $userLogin->longitude =  @implode(',',$info['long']);
-            $userLogin->latitude =  @implode(',',$info['lat']);
-            $userLogin->location =  @implode(',',$info['city']) . (" - ". @implode(',',$info['area']) ."- ") . @implode(',',$info['country']) . (" - ". @implode(',',$info['code']) . " ");
-            $userLogin->country_code = @implode(',',$info['code']);
+            $userLogin->longitude =  @implode(',', $info['long']);
+            $userLogin->latitude =  @implode(',', $info['lat']);
+            $userLogin->location =  @implode(',', $info['city']) . (" - " . @implode(',', $info['area']) . "- ") . @implode(',', $info['country']) . (" - " . @implode(',', $info['code']) . " ");
+            $userLogin->country_code = @implode(',', $info['code']);
             $userLogin->country =  @implode(',', $info['country']);
         }
 
         $userAgent = osBrowser();
         $userLogin->user_id = $user->id;
         $userLogin->user_ip =  $ip;
-        
+
         $userLogin->browser = @$userAgent['browser'];
         $userLogin->os = @$userAgent['os_platform'];
         $userLogin->save();
 
         return redirect()->route('user.home');
     }
-
-
 }
