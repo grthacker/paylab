@@ -9,6 +9,7 @@ use App\Models\GeneralSetting;
 use App\Models\Transaction;
 use App\Models\Service;
 use App\Models\User;
+use App\Models\PaymentLog;
 use App\Models\ApplyService;
 use App\Http\Controllers\InstantPayController;
 
@@ -203,6 +204,16 @@ class ServiceController extends Controller
                 }, $bankData);
                 $select[str_replace(' ', '_', strtolower($category->field_name))] = $bankNames;
             }
+
+            if ($request->id == 15) {
+                $bank = new InstantPayController();
+                $bankData  = $bank->getBillerList('C03');
+
+                $bankNames = array_map(function ($item) {
+                    return $item['billerName'];
+                }, $bankData);
+                $select[str_replace(' ', '_', strtolower($category->field_name))] = $bankNames;
+            }
         }
 
         $user_data = [];
@@ -281,11 +292,28 @@ class ServiceController extends Controller
             $bankTransfer = new InstantPayController();
             $data = json_decode($service->user_data, true);
 
-            $bankTransfer->bankTransfer($data);
+            $response = $bankTransfer->bankTransfer($data);
+            // Payment log
+            $logs = new PaymentLog();
+            $logs->log = json_encode($response);
+            $logs->save();
+
+            if($response['statuscode'] != 'TXN'){
+                $notify[] = ['error', $response['status'] ];
+                return redirect()->route('admin.applied.pending.service')->withNotify($notify);
+            }
+
+            $message = $request->message;
+            if(isset($response['data']['txnReferenceId'])){
+                $message = $response['data']['txnReferenceId'];
+            };
+
             $user = User::find($service->user_id);
             $service->status = 1;
-            $service->admin_feedback = $request->message;
+            $service->admin_feedback = $message;
+            $service->response = json_encode($response);
             $service->save();
+
         } else {
 
             $user = User::find($service->user_id);
@@ -374,5 +402,56 @@ class ServiceController extends Controller
         $services = ApplyService::where('status', '!=', 0)->latest()->paginate(getPaginate());
         $empty_message = 'Data Not Found';
         return view('admin.applied.showServices', compact('page_title', 'services', 'empty_message'));
+    }
+
+    public function serviceApproveApi($id)
+    {
+
+        $service = ApplyService::where('id', $id)->where('status', 2)->firstOrFail();
+        $message = 'DONE';
+        if ($service->service_id == 9) {
+            $bankTransfer = new InstantPayController();
+            $data = json_decode($service->user_data, true);
+
+            $response = $bankTransfer->bankTransfer($data);
+            // Payment log
+            $logs = new PaymentLog();
+            $logs->log = json_encode($response);
+            $logs->save();
+
+            if($response['statuscode'] != 'TXN'){
+                $notify[] = ['error', $response['status'] ];
+                return redirect()->route('user.history.service')->withNotify($notify);
+            }
+
+            $message = 'DONE';
+            if(isset($response['data']['txnReferenceId'])){
+                $message = $response['data']['txnReferenceId'];
+            };
+
+            $user = User::find($service->user_id);
+            $service->status = 1;
+            $service->admin_feedback = $message;
+            $service->response = json_encode($response);
+            $service->save();
+
+        } else {
+
+            $user = User::find($service->user_id);
+            $service->status = 1;
+            $service->admin_feedback = $message;
+            $service->save();
+        }
+        $general = GeneralSetting::first();
+
+        notify($user, 'SERVICE_APPROVE', [
+            'amount' => $service->amount,
+            'charge' => $service->total_charge,
+            'currency' => $general->cur_text,
+            'service_name' => $service->service->category->name,
+            'admin_feedback' => $message,
+        ]);
+
+        return true;
     }
 }

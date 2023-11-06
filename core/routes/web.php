@@ -18,6 +18,7 @@ Route::get('telecomCircle', 'InstantPayController@telecomCircle')->name('telecom
 Route::get('getRechargePlan', 'InstantPayController@getRechargePlan')->name('getRechargePlan');
 Route::get('getBillerDetails', 'InstantPayController@getBillerDetails')->name('getBillerDetails');
 Route::get('getBillEnquiry', 'InstantPayController@getBillEnquiry')->name('getBillEnquiry');
+Route::get('getMerchantList', 'InstantPayController@getMerchantList')->name('getMerchantList');
 
 
 Route::namespace('Gateway')->prefix('ipn')->name('ipn.')->group(function () {

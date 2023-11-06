@@ -207,6 +207,27 @@
                             </div>
 
                             <div class="col-xl-3 col-md-6">
+                                <div class="form-group ">
+                                    <label class="form-control-label font-weight-bold">@lang('Role') </label>
+                                    <select class="form-control" name="role">
+                                        <option value="super_distributor" @if($user->role == 'super_distributor') selected @endif>@lang('Super Distributor')</option>
+                                        <option value="distributor" @if($user->role == 'distributor') selected @endif>@lang('Distributor')</option>
+                                        <option value="retailer" @if($user->role == 'retailer') selected @endif>@lang('Retailer')</option>
+
+                                    </select>
+                                    {{-- <small class="form-text text-muted"><i class="las la-info-circle"></i> @lang('Select the address type')</small> --}}
+                                </div>
+                            </div>
+
+                            @if(isset($user->role_id))
+                            <div class="col-xl-3 col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label font-weight-bold">@lang('ROLE-ID') </label>
+                                    <input class="form-control" type="text" name="city" value="{{@$user->role_id}}" readonly>
+                                </div>
+                            </div>
+                            @endif
+                            <div class="col-xl-3 col-md-6">
                                 <div class="form-group">
                                     <label class="form-control-label font-weight-bold">@lang('City') </label>
                                     <input class="form-control" type="text" name="city" value="{{@$user->address->city}}">

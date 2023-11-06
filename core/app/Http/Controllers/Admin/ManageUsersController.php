@@ -147,6 +147,7 @@ class ManageUsersController extends Controller
         $user->lastname = $request->lastname;
         $user->lastname = $request->lastname;
         $user->email = $request->email;
+        $user->role = $request->role;
         $user->address = [
             'address' => $request->address,
             'city' => $request->city,
@@ -159,6 +160,15 @@ class ManageUsersController extends Controller
         $user->sv = $request->sv ? 1 : 0;
         $user->ts = $request->ts ? 1 : 0;
         $user->tv = $request->tv ? 1 : 0;
+        if($request->role == 'super_distributor'){
+            $user->role_id = 'ZAPAY-SD'.$id;
+        }
+        if($request->role == 'distributor'){
+            $user->role_id = 'ZAPAY-D'.$id;
+        }
+        if($request->role == 'retailer'){
+            $user->role_id = 'ZAPAY-R'.$id;
+        }
         $user->save();
 
         $notify[] = ['success', 'User detail has been updated'];

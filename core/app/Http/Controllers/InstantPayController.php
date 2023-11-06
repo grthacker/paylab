@@ -18,12 +18,13 @@ class InstantPayController extends Controller
     {
         $this->activeTemplate = activeTemplate();
         $this->clientID = 'YWY3OTAzYzNlM2ExZTJlOVNN1AdH6z238AnlhfwRPAk=';
-        $this->client_secret = '09d4f102f78c228d2fffc9fc60027c38a558dcecd1ff2a09895cd3048d512bc5';
+        $this->client_secret = '83c573b05885258b8a8a517915af5f9cbeffd1252b10181e577b04aa1fb9a026';
         $this->EnKey = '500605877e09a340500605877e09a340';
-        $this->public_ip = file_get_contents('https://api.ipify.org');
+        // $this->public_ip = file_get_contents('https://api.ipify.org');
+        $this->public_ip = '66.45.237.230';
     }
 
-    public function getBillerList($cate = 'C05')
+    public function getBillerList($cate = 'C03')
     {
 
         $client = new Client();
@@ -99,7 +100,7 @@ class InstantPayController extends Controller
     public function getRechargePlan(Request $request)
     {
 
-        $subProductCode = $request->operator ?? 'RJA';
+        $subProductCode = $request->operator ?? 'DTH';
         $client = new Client();
 
         $headers = [
@@ -190,9 +191,9 @@ class InstantPayController extends Controller
             'json' => $data
         ]);
 
-        $log = new PaymentLog();
-        $log->log = $response->getBody();
-        $log->save();
+        // $log = new PaymentLog();
+        // $log->log = $response->getBody();
+        // $log->save();
 
         echo $response->getBody();
     }
@@ -263,6 +264,7 @@ class InstantPayController extends Controller
 
     public function bankTransfer($data = '')
     {
+
         $client = new Client();
         $account =  $data['receiver_account_number']['field_value'];
         $name =  $data['receiver_name']['field_value'];
@@ -286,13 +288,13 @@ class InstantPayController extends Controller
                 "name" => $name,
                 "accountNumber" => $account,
                 "bankIfsc" => $ifsc,
-                "payeeListId" => "342134987"
+                "payeeListId" => " "
             ],
             "transferMode" => "IMPS",
             "transferAmount" => $amount,
             "externalRef" => "IMPS1",
-            "latitude" => "20.**36",
-            "longitude" => "78.**28",
+            "latitude" => "28.459497",
+            "longitude" => "77.026634",
         ];
 
         $response = $client->request('POST', 'https://api.instantpay.in/payments/payout', [
@@ -302,6 +304,10 @@ class InstantPayController extends Controller
 
         $responseBody = $response->getBody()->getContents();
         $responseData = json_decode($responseBody, true);
+
+        // $log = new PaymentLog();
+        // $log->log = $responseData;
+        // $log->save();
         return $responseData;
     }
 
@@ -342,5 +348,9 @@ class InstantPayController extends Controller
 
         $responseBody = $response->getBody()->getContents();
         $responseData = json_decode($responseBody, true);
+    }
+
+    public function dth($data = '')
+    {
     }
 }

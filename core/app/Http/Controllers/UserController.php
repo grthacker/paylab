@@ -337,16 +337,19 @@ class UserController extends Controller
             //Mobile Prepaid
             $operator = $operator->getBillerList('C00');
         } else if ($id == 5) {
-            //Gas
+            //Gas Bill
             $operator = $operator->getBillerList('C14');
         } else if ($id == 3) {
-            //Broadband
+            //Broadband Bill
             $operator = $operator->getBillerList('C05');
         } else if ($id == 6) {
-            //Electricity
+            //Electricity Bill
             $operator = $operator->getBillerList('C04');
         } else if ($id == 9) {
+            //Banks Bill
             $operator = $operator->banks();
+        } else if ($id == 15) {
+            $operator = $operator->getBillerList();
         } else {
             $operator = array();
         }

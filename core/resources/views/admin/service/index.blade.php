@@ -138,8 +138,8 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <a class="btn btn-sm btn--primary box--shadow1 text--small" href="{{ route('admin.service.page') }}"><i
-            class="fa fa-fw fa-plus"></i>@lang('Add New')</a>
+    {{-- <a class="btn btn-sm btn--primary box--shadow1 text--small" href="{{ route('admin.service.page') }}"><i
+            class="fa fa-fw fa-plus"></i>@lang('Add New')</a> --}}
 @endpush
 
 

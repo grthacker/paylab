@@ -124,7 +124,7 @@
                                             </div>
                                         @endif
 
-                                        @if ($service->id == 9 || $service->id == 13)
+                                        @if ($service->id == 9 || $service->id == 13 || $service->id == 15)
                                             @if ($service->select_field && $service->category->field_name)
                                                 @php
                                                     $array = json_decode($service->select_field, true);
