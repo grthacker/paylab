@@ -24,13 +24,13 @@
                                 </div>
                                 </div>
                             </div>
-                            <h5 class="title">{{ __($user->fullname) }}</h5>
+                            <h5 class="title">{{ __($user->fullname) }} @if($user->verify == 1) <img src="{{asset('/assets/verify/bluetick.png')}}"  alt="" height="48px" width="26px"> @endif </h5>
                             <span>@lang('Username'): {{ __($user->username) }}</span>
                         </div>
                     </div>
                     <div class="col-lg-12 mt-4">
                     <h5 class="title mb-2">@lang('Edit Profile')</h5>
-                        <div class="row">   
+                        <div class="row">
                             @csrf
                             <div class="col-md-6 mb-3">
                                 <label for="InputFirstname" class="col-form-label">@lang('First Name'):</label>
@@ -62,6 +62,15 @@
                                 <label for="address" class="col-form-label">@lang('Address'):</label>
                                     <input type="text" class="form-control" id="address" name="address" placeholder="@lang('Address')" value="{{@$user->address->address}}" required="">
                             </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="address" class="col-form-label">@lang('Adharcard'):</label>
+                                    <input type="file" class="form-control" id="adharcard" name="adharcard" >
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="address" class="col-form-label">@lang('Pencard'):</label>
+                                    <input type="file" class="form-control"  name="pencard" >
+                            </div>
                             <div class="col-lg-12 mb-3 ml-auto text-right mt-4">
                                 <button type="submit" class="w-100 cmn-btn">@lang('Update Profile')</button>
                             </div>
@@ -88,7 +97,7 @@
             display: inline-block;
             width: 100% !important;
         }
-        
+
         .profile-thumb {
             position: relative;
             width: 11.25rem;

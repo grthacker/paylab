@@ -101,6 +101,13 @@
                                 </a>
                             </li>
 
+                            <li class="sidebar-menu-item {{menuActive('admin.users.unverified')}} ">
+                                <a href="{{route('admin.users.unverified')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Unverified Users')</span>
+                                </a>
+                            </li>
+
                             <li class="sidebar-menu-item {{menuActive('admin.users.active')}} ">
                                 <a href="{{route('admin.users.active')}}" class="nav-link">
                                     <i class="menu-icon las la-dot-circle"></i>

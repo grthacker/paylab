@@ -96,4 +96,9 @@ class User extends Authenticatable
         return $this->where('sv', 1);
     }
 
+    public function scopeUserUnverified()
+    {
+        return $this->where('verify', 0);
+    }
+
 }

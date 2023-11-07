@@ -47,6 +47,27 @@ class UserController extends Controller
         return view($this->activeTemplate . 'user.profile-setting', $data);
     }
 
+    public function mpin(){
+
+        $data['page_title'] = "Profile Setting";
+        $data['user'] = Auth::user();
+        return view($this->activeTemplate . 'user.mpin', $data);
+    }
+
+    public function mpinChange(Request $request){
+
+        $data['page_title'] = "Profile Setting";
+        $id = Auth::user()->id;
+        $user = User::where('id', $id)->where('mpin', $request->current_mpin)->first();
+        if(!$user){
+            $notify[] = ['error', 'MPIN Wrong'];
+            return back()->withNotify($notify);
+        }
+        $user->mpin = $request->mpin_confirmation;
+        $notify[] = ['success', 'MPIN Update Successfully'];
+        return back()->withNotify($notify);
+    }
+
     public function submitProfile(Request $request)
     {
         $request->validate([
@@ -94,6 +115,42 @@ class UserController extends Controller
             $image->resize($size[0], $size[1]);
             $image->save($location);
         }
+        if ($request->hasFile('adharcard')) {
+            $image = $request->file('adharcard');
+            $filename = time() . '_' . $user->username . '.jpg';
+            $location = 'assets/images/user/adhar/' . $filename;
+            $in['adhar'] = $filename;
+
+            $path = './assets/images/user/adhar/';
+            $link = $path . $user->image;
+            if (file_exists($link)) {
+                @unlink($link);
+            }
+            $size = imagePath()['profile']['user']['size'];
+            $image = Image::make($image);
+            $size = explode('x', strtolower($size));
+            $image->resize($size[0], $size[1]);
+            $image->save($location);
+        }
+
+        if ($request->hasFile('pencard')) {
+            $image = $request->file('pencard');
+            $filename = time() . '_' . $user->username . '.jpg';
+            $location = 'assets/images/user/pencard/' . $filename;
+            $in['pencard'] = $filename;
+
+            $path = './assets/images/user/pencard/';
+            $link = $path . $user->image;
+            if (file_exists($link)) {
+                @unlink($link);
+            }
+            $size = imagePath()['profile']['user']['size'];
+            $image = Image::make($image);
+            $size = explode('x', strtolower($size));
+            $image->resize($size[0], $size[1]);
+            $image->save($location);
+        }
+
         $user->fill($in)->save();
         $notify[] = ['success', 'Profile Updated successfully.'];
         return back()->withNotify($notify);

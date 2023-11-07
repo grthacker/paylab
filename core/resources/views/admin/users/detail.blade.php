@@ -185,7 +185,7 @@
 
                         <div class="row mt-4">
 
-                            <div class="col-md-12 mb-4">
+                            {{-- <div class="col-md-12 mb-4">
                                 <label class="form-control-label font-weight-bold">@lang('Referral Link') </label>
                                 <div class="input-group">
                                   <input class="form-control" readonly="" type="text" id="link" value="{{ route('user.refer.register', $user->username) }}">
@@ -195,7 +195,7 @@
                                     </span>
                                   </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="col-md-12">
                                 <div class="form-group ">
@@ -254,6 +254,36 @@
                                     <select name="country" class="form-control"> @include('partials.country') </select>
                                 </div>
                             </div>
+                            @if($user->verify == 0 )
+                                <div class="col-xl-3 col-md-6">
+                                    <div class="form-group ">
+                                        <label class="form-control-label font-weight-bold">@lang('Verify') </label>
+                                        <select class="form-control" name="verify">
+                                            <option value="0" selected >@lang('No')</option>
+                                            <option value="1" >@lang('Yes')</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            @endif
+                            @if($user->adhar)
+                            <div class="col-xl-0 col-md-6">
+                                <div class="form-group ">
+                                    <label class="form-control-label font-weight-bold">@lang('Adhar') </label>
+                                    <a  href="{{ asset('assets/images/user/adhar/'.$user->adhar) }}" target="_blank" class="btn btn--primary btn-block btn-sm">@lang('View')
+                                    </a>
+                                </div>
+                            </div>
+                            @endif
+
+                            @if($user->pencard)
+                            <div class="col-xl-0 col-md-6">
+                                <div class="form-group ">
+                                    <label class="form-control-label font-weight-bold">@lang('Pencard') </label>
+                                    <a href="{{ asset('assets/images/user/pencard/'.$user->pencard) }}" target="_blank" class="btn btn--primary btn-block btn-sm">@lang('View')
+                                    </a>
+                                </div>
+                            </div>
+                            @endif
                         </div>
 
 

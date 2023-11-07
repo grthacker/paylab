@@ -49,6 +49,15 @@ class ManageUsersController extends Controller
         $users = User::emailUnverified()->latest()->paginate(getPaginate());
         return view('admin.users.list', compact('page_title', 'empty_message', 'users'));
     }
+
+    public function unverifiedUsers()
+    {
+        $page_title = 'Unverified Users';
+        $empty_message = 'No unverified user found';
+        $users = User::userUnverified()->latest()->paginate(getPaginate());
+        return view('admin.users.list', compact('page_title', 'empty_message', 'users'));
+    }
+
     public function emailVerifiedUsers()
     {
         $page_title = 'Email Verified Users';
@@ -160,6 +169,7 @@ class ManageUsersController extends Controller
         $user->sv = $request->sv ? 1 : 0;
         $user->ts = $request->ts ? 1 : 0;
         $user->tv = $request->tv ? 1 : 0;
+
         if($request->role == 'super_distributor'){
             $user->role_id = 'ZAPAY-SD'.$id;
         }
@@ -169,11 +179,15 @@ class ManageUsersController extends Controller
         if($request->role == 'retailer'){
             $user->role_id = 'ZAPAY-R'.$id;
         }
+        if(isset($request->verify) && $request->verify == 1 ){
+            $user->verify = 1;
+        }
         $user->save();
 
         $notify[] = ['success', 'User detail has been updated'];
         return redirect()->back()->withNotify($notify);
     }
+
 
     public function addSubBalance(Request $request, $id)
     {
@@ -248,8 +262,6 @@ class ManageUsersController extends Controller
         $login_logs = $user->login_logs()->latest()->paginate(getPaginate());
         return view('admin.users.logins', compact('page_title', 'empty_message', 'login_logs'));
     }
-
-
 
     public function showEmailSingleForm($id)
     {
